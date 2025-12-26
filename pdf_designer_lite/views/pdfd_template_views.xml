@@ -41,9 +41,8 @@
                         <field name="show_logo" />
                         <field name="title_text" />
                         <field name="title_align" />
-                        <field name="show_header_fields" />
-                        <field name="show_table" />
-                        <field name="show_totals" />
+                        <field name="show_portal_fields" />
+                        <field name="portal_columns" />
                         <field name="footer_text" />
                     </group>
                     <notebook>
