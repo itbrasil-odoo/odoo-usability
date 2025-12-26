@@ -11,6 +11,7 @@ class SblDynamicPortalLine(models.Model):
     sbl_dynamic_portal_id = fields.Many2one(
         "sbl.dynamic.portal", string="Dynamic Portal"
     )
+    sbl_detail_portal_id = fields.Many2one("sbl.dynamic.portal", string="Detail Portal")
     sequence = fields.Integer()
     sbl_model_id = fields.Many2one("ir.model", string="Model")
     sbl_field_id = fields.Many2one("ir.model.fields", string="Field")

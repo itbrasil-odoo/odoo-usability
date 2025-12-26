@@ -131,6 +131,12 @@ class SblCustomerPortal(CustomerPortal):
             record_sudo, sbl_dynamic_portal, **kwargs
         )
 
+        # If using generic template, render it directly
+        if sbl_dynamic_portal.sbl_use_generic_template:
+            return request.render(
+                "sensible_dynamic_portal.sbl_portal_my_detail_generic", values
+            )
+
         return request.render("sensible_dynamic_portal.sbl_portal_my_detail", values)
 
     def _sbl_get_page_view_values(self, record, sbl_dynamic_portal, **kwargs):
@@ -180,12 +186,52 @@ class SblCustomerPortal(CustomerPortal):
         record_id,
         report_type="html",
         download=False,
-        **kwargs,
     ):
+        # Buscar o registro do modelo real (ex: maintenance.equipment)
         try:
-            record_sudo = self._document_check_access(model, record_id)
-        except (AccessError, MissingError):
-            return request.redirect("/my")
+            Model = request.env[model]
+            record_sudo = Model.browse(record_id).sudo()
+            if not record_sudo.exists():
+                return request.redirect("/my")
+        except Exception as e:
+            # Log de debug no PDF
+            values = {
+                "docs": request.env["sbl.dynamic.portal"].browse(sbl_dynamic_portal.id),
+                "sbl_dynamic_portal": sbl_dynamic_portal,
+                "portal_config_id": sbl_dynamic_portal.id,
+                "debug_error": str(e),
+            }
+            return request.render(
+                "sensible_dynamic_portal.sbl_generic_report_document",
+                values,
+            )
+
+        # If using generic template, render it como HTML ou PDF
+        if sbl_dynamic_portal.sbl_use_generic_template:
+            portal_config_id = (
+                int(sbl_dynamic_portal.id)
+                if sbl_dynamic_portal and sbl_dynamic_portal.exists()
+                else False
+            )
+            if report_type == "html":
+                values = {
+                    "docs": record_sudo,
+                    "sbl_dynamic_portal": sbl_dynamic_portal,
+                    "portal_config_id": portal_config_id,
+                }
+                return request.render(
+                    "sensible_dynamic_portal.sbl_generic_report_document", values
+                )
+            else:
+                # For PDF, prepare the data context
+                return self._sbl_show_report(
+                    model=record_sudo,
+                    report_type=report_type,
+                    report_ref="sensible_dynamic_portal.sbl_generic_report_document",
+                    download=download,
+                    portal_config_id=portal_config_id,
+                )
+
         return self._sbl_show_report(
             model=record_sudo,
             report_type=report_type,
@@ -193,7 +239,9 @@ class SblCustomerPortal(CustomerPortal):
             download=download,
         )
 
-    def _sbl_show_report(self, model, report_type, report_ref, download=False):
+    def _sbl_show_report(
+        self, model, report_type, report_ref, download=False, portal_config_id=None
+    ):
         if report_type not in ("html", "pdf", "text"):
             raise UserError(self.env._("Invalid report type: %s", report_type))
 
@@ -204,9 +252,14 @@ class SblCustomerPortal(CustomerPortal):
                 raise UserError(self.env._("Multi company reports are not supported."))
             ReportAction = ReportAction.with_company(model.company_id)
 
+        # Prepare data context
+        data = {"report_type": report_type}
+        if portal_config_id:
+            data["portal_config_id"] = portal_config_id
+
         method_name = f"_render_qweb_{report_type}"
         pdf = getattr(ReportAction, method_name)(
-            report_ref, list(model.ids), data={"report_type": report_type}
+            report_ref, list(model.ids), data=data
         )[0]
         headers = self._sbl_get_http_headers(model, report_type, pdf, download)
         return request.make_response(pdf, headers=headers)

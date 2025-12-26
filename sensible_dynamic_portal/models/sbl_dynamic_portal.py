@@ -17,8 +17,23 @@ class SblDynamicPortal(models.Model):
     sbl_report_id = fields.Many2one(
         "ir.actions.report", string="Report", help="Display as detailed view"
     )
+    sbl_use_generic_template = fields.Boolean(
+        string="Use Generic Template",
+        default=True,
+        help="If enabled, uses a generic auto-generated template. "
+        "If disabled, you must configure a QWeb report.",
+    )
     sbl_field_line = fields.One2many(
         "sbl.dynamic.portal.line", "sbl_dynamic_portal_id", string="Fields"
+    )
+    sbl_detail_field_line = fields.One2many(
+        "sbl.dynamic.portal.line",
+        "sbl_detail_portal_id",
+        string="Detail Fields",
+        help=(
+            "Fields to display in the detail view. If empty, uses the same fields "
+            "as the list view."
+        ),
     )
     sbl_sortby_ids = fields.Many2many(
         "ir.model.fields",

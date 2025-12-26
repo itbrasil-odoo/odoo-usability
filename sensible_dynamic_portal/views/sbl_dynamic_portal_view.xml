@@ -37,16 +37,51 @@
                         <group>
                             <field name="active" widget="boolean_toggle" />
                             <field
+                                name="sbl_use_generic_template"
+                                widget="boolean_toggle"
+                            />
+                            <field
                                 name="sbl_report_id"
                                 domain="[('model', '=', sbl_model_name)]"
+                                invisible="sbl_use_generic_template"
+                                required="not sbl_use_generic_template"
                             />
                             <field name="sbl_sortby_ids" widget="many2many_tags" />
                         </group>
                     </group>
                     <notebook>
-                        <page name="fields" string="Fields">
+                        <page name="fields" string="List Fields">
                             <field
                                 name="sbl_field_line"
+                                context="{'default_sbl_model_id': sbl_model_id}"
+                            >
+                                <list editable="bottom">
+                                    <field name="sequence" widget="handle" />
+                                    <field name="sbl_model_id" column_invisible="1" />
+                                    <field
+                                        name="sbl_field_id"
+                                        required="1"
+                                        domain="[('model_id', '=', sbl_model_id), ('ttype', 'not in', ['one2many', 'binary'])]"
+                                    />
+                                    <field name="sbl_ttype" />
+                                    <field
+                                        name="sbl_display_currency"
+                                        widget="boolean_toggle"
+                                        invisible="sbl_ttype != 'float'"
+                                    />
+                                </list>
+                            </field>
+                        </page>
+                        <page
+                            name="detail_fields"
+                            string="Detail Fields"
+                            invisible="not sbl_use_generic_template"
+                        >
+                            <p class="alert alert-info" role="alert">
+                                Configure the fields to display in the detail view. If left empty, the same fields from the list will be used.
+                            </p>
+                            <field
+                                name="sbl_detail_field_line"
                                 context="{'default_sbl_model_id': sbl_model_id}"
                             >
                                 <list editable="bottom">

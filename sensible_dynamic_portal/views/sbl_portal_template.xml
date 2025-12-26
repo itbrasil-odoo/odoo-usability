@@ -103,7 +103,9 @@
                 <t t-foreach="records" t-as="record">
                     <tr>
                         <td t-foreach="sbl_dynamic_portal.sbl_field_line" t-as="line">
-                            <t t-if="sbl_dynamic_portal.sbl_report_id">
+                            <t
+                                t-if="sbl_dynamic_portal.sbl_use_generic_template or sbl_dynamic_portal.sbl_report_id"
+                            >
                                 <a
                                     t-attf-href="/my/#{sbl_dynamic_portal.id}/#{sbl_dynamic_portal.sbl_model_id.model}/#{record.id}"
                                 >
@@ -209,4 +211,213 @@
             <attribute name="class" add="o_image_64_max" />
         </xpath>
     </template>
+
+    <!-- Generic Template for Detail View (when using generic template) -->
+    <template
+        id="sbl_portal_my_detail_generic"
+        inherit_id="portal.portal_sidebar"
+        primary="True"
+    >
+        <xpath expr="//div[hasclass('o_portal_sidebar')]" position="inside">
+            <div class="row">
+                <!-- Sidebar -->
+                <t t-call="portal.portal_record_sidebar">
+                    <t t-set="classes" t-value="'col-lg-4 col-xxl-3 d-print-none'" />
+                    <t t-set="title">
+                        <h2 class="mb-0 text-break mx-auto">
+                            <span t-field="record.display_name" />
+                        </h2>
+                    </t>
+                    <t t-set="entries">
+                        <div class="d-flex flex-column gap-4 mt-3">
+                            <div
+                                class="d-flex flex-column gap-2"
+                                id="sale_order_sidebar_button"
+                            >
+                                <div
+                                    class="o_download_pdf d-flex gap-2 flex-lg-column flex-xl-row flex-wrap"
+                                >
+                                    <a
+                                        class="btn btn-light o_print_btn o_portal_invoice_print flex-grow-1"
+                                        t-attf-href="/report/detail/#{sbl_dynamic_portal.id}/#{record._name}/#{record.id}/pdf?download=1"
+                                        id="sbl_print_report"
+                                        title="Download"
+                                        role="button"
+                                        target="_blank"
+                                    >
+                                        <i class="fa fa-print me-1" />Download
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </t>
+                <!-- Page Content -->
+                <div class="o_portal_content col-12 col-lg-8 col-xxl-9">
+                    <div id="sbl_generic_detail_content" class="card mt-3">
+                        <div class="card-body">
+                            <t
+                                t-set="detail_fields"
+                                t-value="sbl_dynamic_portal.sbl_detail_field_line if sbl_dynamic_portal.sbl_detail_field_line else sbl_dynamic_portal.sbl_field_line"
+                            />
+                            <div class="row">
+                                <t t-foreach="detail_fields" t-as="line">
+                                    <div class="col-md-6 mb-3">
+                                        <strong>
+                                            <t
+                                            t-out="line.sbl_field_id.field_description"
+                                        />:
+                                        </strong>
+                                        <div>
+                                            <t
+                                                t-set="data"
+                                                t-value="sbl_dynamic_portal.sbl_return_field_value(record, line, request.lang)"
+                                            />
+                                            <t t-if="line.sbl_ttype == 'many2many'">
+                                                <t t-foreach="data" t-as="rec">
+                                                    <span
+                                                        class="badge rounded-pill text-bg-primary me-1"
+                                                        t-out="rec.name"
+                                                    />
+                                                </t>
+                                            </t>
+                                            <t t-elif="line.sbl_ttype == 'boolean'">
+                                                <input
+                                                    type="checkbox"
+                                                    t-att-checked="data"
+                                                    disabled="disabled"
+                                                />
+                                            </t>
+                                            <t t-else="">
+                                                <span t-out="data" />
+                                            </t>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- chatter -->
+                <t t-if="'message_ids' in record._fields">
+                    <div id="sbl_communication" class="mt-4">
+                        <h3>Communication history</h3>
+                        <t t-call="portal.message_thread" />
+                    </div>
+                </t>
+            </div>
+        </xpath>
+    </template>
+
+    <!-- Generic Report Document (for iframe/HTML rendering) -->
+    <template id="sbl_generic_report_document">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>
+                            <span t-field="o.display_name" />
+                        </h2>
+                        <!-- Load portal config from ID if passed via data -->
+                        <t t-if="sbl_dynamic_portal is defined">
+                            <t t-set="portal_config" t-value="sbl_dynamic_portal" />
+                        </t>
+                        <t t-else="">
+                            <!-- Busca pelo modelo do registro exibido -->
+                            <t
+                                t-set="_portal_config"
+                                t-value="env['sbl.dynamic.portal'].sudo().search([('sbl_model_name', '=', o._name)], limit=1)"
+                            />
+                            <t t-if="not _portal_config or not _portal_config.exists()">
+                                <t
+                                    t-set="_portal_config"
+                                    t-value="env['sbl.dynamic.portal'].sudo().search([('sbl_model_id.model', '=', o._name)], limit=1)"
+                                />
+                            </t>
+                            <t t-if="_portal_config and _portal_config.exists()">
+                                <t t-set="portal_config" t-value="_portal_config" />
+                            </t>
+                        </t>
+                        <t t-if="portal_config and portal_config.exists()">
+                            <t
+                                t-set="detail_fields"
+                                t-value="portal_config.sbl_detail_field_line if portal_config.sbl_detail_field_line else portal_config.sbl_field_line"
+                            />
+                            <div class="row mt-4">
+                                <t t-foreach="detail_fields" t-as="line">
+                                    <div class="col-6 mb-3">
+                                        <strong>
+                                            <t
+                                            t-out="line.sbl_field_id.field_description"
+                                        />:
+                                        </strong>
+                                        <div>
+                                            <t
+                                                t-set="data"
+                                                t-value="portal_config.sbl_return_field_value(o, line, request.lang)"
+                                            />
+                                            <t t-if="line.sbl_ttype == 'many2many'">
+                                                <t t-foreach="data" t-as="rec">
+                                                    <span t-out="rec.name" />,
+                                                </t>
+                                            </t>
+                                            <t t-elif="line.sbl_ttype == 'boolean'">
+                                                <span t-if="data">Yes</span>
+                                                <span t-else="">No</span>
+                                            </t>
+                                            <t t-else="">
+                                                <span t-out="data" />
+                                            </t>
+                                        </div>
+                                    </div>
+                                </t>
+                            </div>
+                        </t>
+                        <t t-else="">
+                            <div class="alert alert-warning" role="alert">
+                                Configuração do portal não encontrada para este relatório.<br
+                            />
+                                <b>Debug:</b> Modelo exibido: <span
+                                t-out="o._name"
+                            />.<br />
+                                <b>ID do registro exibido:</b> <span t-out="o.id" />.<br
+                            />
+                                <b>Modelo do registro exibido:</b> <span
+                                t-out="o._name"
+                            />.<br />
+                                <b>Recordset exibido:</b> <span t-out="o" />.<br />
+                                <b>Busca por sbl_model_name:</b> <span
+                                t-out="env['sbl.dynamic.portal'].sudo().search([('sbl_model_name', '=', o._name)])"
+                            /><br />
+                                <b>Busca por sbl_model_id.model:</b> <span
+                                t-out="env['sbl.dynamic.portal'].sudo().search([('sbl_model_id.model', '=', o._name)])"
+                            /><br />
+                                <b>Erro controller:</b> <span
+                                t-out="debug_error if debug_error is defined else ''"
+                            />
+                            </div>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Generic Report Print Action -->
+    <record id="sbl_generic_report_print" model="ir.actions.report">
+        <field name="name">Generic Portal Report</field>
+        <field name="model">sbl.dynamic.portal</field>
+        <field name="report_type">qweb-pdf</field>
+        <field
+            name="report_name"
+        >sensible_dynamic_portal.sbl_generic_report_document</field>
+        <field
+            name="report_file"
+        >sensible_dynamic_portal.sbl_generic_report_document</field>
+        <field
+            name="print_report_name"
+        >'Generic Report - %s' % object.display_name</field>
+        <field name="binding_model_id" ref="model_sbl_dynamic_portal" />
+        <field name="binding_type">report</field>
+    </record>
 </odoo>
