@@ -1,6 +1,7 @@
 # Powered by Sensible Consulting Services
 # © 2025 Sensible Consulting Services (<https://sensiblecs.com/>)
 import ast
+import logging
 import re
 
 from odoo import http
@@ -9,6 +10,8 @@ from odoo.http import content_disposition, request
 
 from odoo.addons.portal.controllers.portal import CustomerPortal
 from odoo.addons.portal.controllers.portal import pager as portal_pager
+
+_logger = logging.getLogger(__name__)
 
 
 class SblCustomerPortal(CustomerPortal):
@@ -206,6 +209,19 @@ class SblCustomerPortal(CustomerPortal):
                 values,
             )
 
+        pdfd_template_key = None
+        if report_type in ("html", "pdf"):
+            pdfd_template_key = self._sbl_get_pdf_designer_template(model)
+            if pdfd_template_key:
+                pdfd_values = self._sbl_prepare_pdf_designer_values(
+                    record_sudo, sbl_dynamic_portal
+                )
+                pdfd_response = self._sbl_render_pdf_designer_template(
+                    pdfd_template_key, pdfd_values, report_type, download
+                )
+                if pdfd_response:
+                    return pdfd_response
+
         # If using generic template, render it como HTML ou PDF
         if sbl_dynamic_portal.sbl_use_generic_template:
             portal_config_id = (
@@ -238,6 +254,191 @@ class SblCustomerPortal(CustomerPortal):
             report_ref=sbl_dynamic_portal.sbl_report_id.report_name,
             download=download,
         )
+
+    def _sbl_get_pdf_designer_template(self, model_name):
+        """Find or create the pdf_designer_lite view for the given model."""
+        base_key = model_name.replace(".", "_")
+        candidate_keys = [
+            f"pdf_designer_lite.{base_key}",
+            f"pdf_designer_lite.{model_name}",
+            base_key,
+            model_name,
+        ]
+
+        View = request.env["ir.ui.view"].sudo()
+        for key in candidate_keys:
+            view = View.search([("key", "=", key)], limit=1)
+            if view:
+                return view.key
+
+        if "pdfd.template" not in request.env:
+            return False
+
+        pdf_template_domain = [
+            "|",
+            ("key", "in", candidate_keys),
+            ("model_id.model", "=", model_name),
+        ]
+        pdf_template = (
+            request.env["pdfd.template"].sudo().search(pdf_template_domain, limit=1)
+        )
+        if not pdf_template:
+            return False
+
+        if not pdf_template.xml_arch:
+            pdf_template.action_generate_xml()
+
+        normalized_key = pdf_template._normalized_tname()
+        view_values = {
+            "name": f"PDF Designer Lite - {pdf_template.name or normalized_key}",
+            "type": "qweb",
+            "arch_db": pdf_template.xml_arch or f'<t t-name="{normalized_key}"></t>',
+            "key": normalized_key,
+        }
+        try:
+            view = View.search([("key", "=", normalized_key)], limit=1)
+            if view:
+                view.write(view_values)
+            else:
+                view = View.create(view_values)
+
+            if hasattr(View, "clear_caches"):
+                View.clear_caches()
+
+            return view.key
+        except Exception as exc:
+            _logger.exception(
+                "Failed to prepare pdf_designer_lite template %s: %s",
+                normalized_key,
+                exc,
+            )
+            return False
+
+    def _sbl_prepare_pdf_designer_values(self, record, sbl_dynamic_portal):
+        record_sudo = record.sudo()
+        doc_values = {}
+        try:
+            doc_values = record_sudo.read()[0]
+        except Exception as exc:
+            _logger.warning(
+                "Failed to read record %s for PDF Designer values: %s",
+                record_sudo,
+                exc,
+            )
+
+        company_record = (
+            record_sudo.company_id
+            if hasattr(record_sudo, "company_id") and record_sudo.company_id
+            else request.env.company
+        )
+        company_values = {}
+        if company_record:
+            company_values = {
+                "id": company_record.id,
+                "name": company_record.name,
+                "logo": (
+                    f"/web/image/{company_record._name}/{company_record.id}/logo"
+                    if company_record.logo
+                    else False
+                ),
+            }
+
+        portal_fields = []
+        portal_config = sbl_dynamic_portal.sudo() if sbl_dynamic_portal else False
+        if portal_config and portal_config.exists():
+            lang_record = False
+            if request and getattr(request, "lang", False):
+                lang_obj = request.lang
+                if hasattr(lang_obj, "date_format"):
+                    lang_record = lang_obj
+                else:
+                    lang_code = getattr(lang_obj, "code", False) or str(lang_obj)
+                    lang_record = (
+                        request.env["res.lang"]
+                        .sudo()
+                        .search([("code", "=", lang_code)], limit=1)
+                    )
+
+            detail_fields = (
+                portal_config.sbl_detail_field_line
+                if portal_config.sbl_detail_field_line
+                else portal_config.sbl_field_line
+            )
+            for line in detail_fields:
+                try:
+                    value = portal_config.sbl_return_field_value(
+                        record_sudo, line, lang_record or request.lang
+                    )
+                except Exception as exc:
+                    _logger.warning(
+                        "Failed to fetch portal field value for %s on %s: %s",
+                        line.sbl_field_id.name,
+                        record_sudo,
+                        exc,
+                    )
+                    value = ""
+
+                portal_fields.append(
+                    {
+                        "label": line.sbl_field_id.field_description,
+                        "technical_name": line.sbl_field_id.name,
+                        "ttype": line.sbl_ttype,
+                        "value": value,
+                    }
+                )
+
+        return {
+            "doc": doc_values,
+            "doc_record": record_sudo,
+            "record": record_sudo,
+            "docs": record_sudo,
+            "doc_model": record_sudo._name,
+            "company": company_values,
+            "sbl_dynamic_portal": sbl_dynamic_portal.sudo(),
+            "portal_config_id": sbl_dynamic_portal.id if sbl_dynamic_portal else False,
+            "portal_fields": portal_fields,
+            "portal_config": portal_config,
+            "report_action": (
+                sbl_dynamic_portal.sudo().sbl_report_id
+                if sbl_dynamic_portal and sbl_dynamic_portal.sbl_report_id
+                else False
+            ),
+        }
+
+    def _sbl_render_pdf_designer_template(
+        self, template_key, values, report_type, download
+    ):
+        try:
+            if report_type == "html":
+                return request.render(template_key, values)
+
+            html_body = (
+                request.env["ir.ui.view"].sudo()._render_template(template_key, values)
+            )
+            wrapped_html = html_body
+            if "<html" not in html_body.lower():
+                wrapped_html = f"<html><body>{html_body}</body></html>"
+
+            pdf_content = (
+                request.env["ir.actions.report"]
+                .sudo()
+                ._run_wkhtmltopdf(
+                    [wrapped_html],
+                    report_ref=values.get("report_action") or False,
+                )
+            )
+            model = (
+                values.get("record") or values.get("docs") or values.get("doc_record")
+            )
+            headers = self._sbl_get_http_headers(model, "pdf", pdf_content, download)
+            return request.make_response(pdf_content, headers=headers)
+        except Exception as exc:
+            _logger.exception(
+                "Failed to render pdf_designer_lite template %s: %s",
+                template_key,
+                exc,
+            )
+            return False
 
     def _sbl_show_report(
         self, model, report_type, report_ref, download=False, portal_config_id=None

@@ -10,7 +10,7 @@
     "maintainers": ["renanteixeira"],
     "website": "https://github.com/itbrasil-odoo/odoo-usability",
     "license": "AGPL-3",
-    "depends": ["portal"],
+    "depends": ["portal", "pdf_designer_lite"],
     "data": [
         "security/ir.model.access.csv",
         "views/sbl_dynamic_portal_view.xml",
