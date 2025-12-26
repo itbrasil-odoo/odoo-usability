@@ -191,10 +191,21 @@ class SblCustomerPortal(CustomerPortal):
         download=False,
     ):
         # Buscar o registro do modelo real (ex: maintenance.equipment)
+        _logger.warning(
+            "PDFD: report_detail start model=%s record_id=%s type=%s",
+            model,
+            record_id,
+            report_type,
+        )
         try:
             Model = request.env[model]
             record_sudo = Model.browse(record_id).sudo()
             if not record_sudo.exists():
+                _logger.warning(
+                    "PDFD: record not found model=%s id=%s -> redirect /my",
+                    model,
+                    record_id,
+                )
                 return request.redirect("/my")
         except Exception as e:
             # Log de debug no PDF
@@ -211,16 +222,29 @@ class SblCustomerPortal(CustomerPortal):
 
         pdfd_template_key = None
         if report_type in ("html", "pdf"):
+            _logger.warning(
+                "PDFD: looking for pdf_designer template for model=%s", model
+            )
             pdfd_template_key = self._sbl_get_pdf_designer_template(model)
             if pdfd_template_key:
+                _logger.warning(
+                    "PDFD: using designer template key=%s", pdfd_template_key
+                )
                 pdfd_values = self._sbl_prepare_pdf_designer_values(
                     record_sudo, sbl_dynamic_portal
+                )
+                _logger.warning(
+                    "PDFD: portal_fields_count=%s",
+                    len(pdfd_values.get("portal_fields", []) or []),
                 )
                 pdfd_response = self._sbl_render_pdf_designer_template(
                     pdfd_template_key, pdfd_values, report_type, download
                 )
                 if pdfd_response:
                     return pdfd_response
+                _logger.warning("PDFD: designer render returned False, falling back")
+            else:
+                _logger.warning("PDFD: no designer template found for model=%s", model)
 
         # If using generic template, render it como HTML ou PDF
         if sbl_dynamic_portal.sbl_use_generic_template:
@@ -269,9 +293,11 @@ class SblCustomerPortal(CustomerPortal):
         for key in candidate_keys:
             view = View.search([("key", "=", key)], limit=1)
             if view:
+                _logger.warning("PDFD: found existing ir.ui.view for key=%s", key)
                 return view.key
 
         if "pdfd.template" not in request.env:
+            _logger.warning("PDFD: model pdfd.template not in registry; skipping")
             return False
 
         pdf_template_domain = [
@@ -279,27 +305,52 @@ class SblCustomerPortal(CustomerPortal):
             ("key", "in", candidate_keys),
             ("model_id.model", "=", model_name),
         ]
+        _logger.warning(
+            "PDFD: searching template with domain=%s for model=%s",
+            pdf_template_domain,
+            model_name,
+        )
         pdf_template = (
             request.env["pdfd.template"].sudo().search(pdf_template_domain, limit=1)
         )
         if not pdf_template:
+            _logger.warning("PDFD: no pdfd.template found for model=%s", model_name)
             return False
 
         if not pdf_template.xml_arch:
+            _logger.warning(
+                "PDFD: template %s missing xml_arch, generating XML", pdf_template
+            )
             pdf_template.action_generate_xml()
 
         normalized_key = pdf_template._normalized_tname()
+        _logger.warning(
+            "PDFD: normalized key for template %s => %s", pdf_template, normalized_key
+        )
         view_values = {
             "name": f"PDF Designer Lite - {pdf_template.name or normalized_key}",
             "type": "qweb",
             "arch_db": pdf_template.xml_arch or f'<t t-name="{normalized_key}"></t>',
             "key": normalized_key,
         }
+        model_name_val = (
+            pdf_template.model_id.model if pdf_template.model_id else model_name
+        )
+        if model_name_val:
+            view_values["model"] = model_name_val
         try:
             view = View.search([("key", "=", normalized_key)], limit=1)
             if view:
+                _logger.warning(
+                    "PDFD: updating existing ir.ui.view %s for key=%s",
+                    view,
+                    normalized_key,
+                )
                 view.write(view_values)
             else:
+                _logger.warning(
+                    "PDFD: creating new ir.ui.view for key=%s", normalized_key
+                )
                 view = View.create(view_values)
 
             if hasattr(View, "clear_caches"):
@@ -417,7 +468,14 @@ class SblCustomerPortal(CustomerPortal):
             )
             wrapped_html = html_body
             if "<html" not in html_body.lower():
-                wrapped_html = f"<html><body>{html_body}</body></html>"
+                wrapped_html = (
+                    "<html><head>"
+                    '<meta http-equiv="Content-Type" '
+                    'content="text/html; charset=utf-8"/>'
+                    "</head><body>"
+                    f"{html_body}"
+                    "</body></html>"
+                )
 
             pdf_content = (
                 request.env["ir.actions.report"]
