@@ -158,8 +158,13 @@ class DbBackup(models.Model):
                             shutil.copyfileobj(cached, destiny)
                     # Generate new backup
                     else:
+                        # Odoo 19: added with_filestore parameter
+                        with_filestore = rec.backup_format == "zip"
                         db.dump_db(
-                            self.env.cr.dbname, destiny, backup_format=rec.backup_format
+                            self.env.cr.dbname,
+                            destiny,
+                            backup_format=rec.backup_format,
+                            with_filestore=with_filestore,
                         )
                         backup = backup or destiny.name
                 successful |= rec
@@ -170,8 +175,13 @@ class DbBackup(models.Model):
             for rec in sftp:
                 filename = self.filename(datetime.now(), ext=rec.backup_format)
                 with rec.backup_log():
+                    # Odoo 19: added with_filestore parameter
+                    with_filestore = rec.backup_format == "zip"
                     cached = db.dump_db(
-                        self.env.cr.dbname, None, backup_format=rec.backup_format
+                        self.env.cr.dbname,
+                        None,
+                        backup_format=rec.backup_format,
+                        with_filestore=with_filestore,
                     )
 
                     with cached:
