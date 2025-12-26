@@ -141,7 +141,12 @@ class SblCustomerPortal(CustomerPortal):
         }
 
         # Setup message thread parameters for portal users
-        if hasattr(record, "message_ids") and hasattr(record, "_sign_token"):
+        # Check if the model inherits from portal.mixin
+        if (
+            hasattr(record, "message_ids")
+            and hasattr(record, "_sign_token")
+            and hasattr(record, "_portal_ensure_token")
+        ):
             # Generate access token for messaging
             access_token = record._portal_ensure_token()
             # Get partner ID and hash for secure messaging
