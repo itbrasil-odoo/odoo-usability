@@ -12,6 +12,12 @@ class PdfdTemplate(models.Model):
 
     name = fields.Char(required=True, tracking=True)
     key = fields.Char(string="QWeb t-name", help='Used as <t t-name="...">', copy=False)
+    model_id = fields.Many2one(
+        "ir.model",
+        string="Model",
+        help="Bind this template to a model so portals can auto-pick it.",
+        tracking=True,
+    )
 
     # Simple switches instead of a builder UI
     show_logo = fields.Boolean(default=True)
@@ -62,7 +68,12 @@ class PdfdTemplate(models.Model):
     def _normalized_tname(self):
         import re
 
-        base = (self.key or f"pdfd_lite_{self.id or 'new'}").strip()
+        model_key = (
+            self.model_id.model.replace(".", "_")
+            if self.model_id and self.model_id.id
+            else False
+        )
+        base = (self.key or model_key or f"pdfd_lite_{self.id or 'new'}").strip()
         base = re.sub(r"[^A-Za-z0-9._-]", "_", base)
         # If user typed a simple name, namespace it to avoid collisions
         if "." not in base:
