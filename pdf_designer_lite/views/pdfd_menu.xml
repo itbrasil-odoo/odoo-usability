@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <menuitem id="menu_pdfd_root" name="PDF Designer" sequence="10" />
+    <menuitem
+        id="menu_pdfd_templates"
+        name="Templates"
+        parent="menu_pdfd_root"
+        action="action_pdfd_templates"
+    />
+</odoo>

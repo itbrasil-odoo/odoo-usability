@@ -1,0 +1,2 @@
+- Create a model that builds QWeb XML dynamically
+- Render live HTML previews using sample data

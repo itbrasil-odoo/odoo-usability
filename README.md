@@ -22,6 +22,7 @@ Available addons
 addon | version | maintainers | summary
 --- | --- | --- | ---
 [auto_backup](auto_backup/) | 19.0.1.0.0 |  | Backups database
+[pdf_designer_lite](pdf_designer_lite/) | 19.0.1.0.0 |  | Pick options → Generate QWeb XML → Preview → Export
 [sensible_dynamic_portal](sensible_dynamic_portal/) | 19.0.1.0.0 | <a href='https://github.com/renanteixeira'><img src='https://github.com/renanteixeira.png' width='32' height='32' style='border-radius:50%;' alt='renanteixeira'/></a> | Dynamic portals offer customizable
 
 [//]: # (end addons)

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <!-- tree -->
+    <record id="view_pdfd_template_tree" model="ir.ui.view">
+        <field name="name">pdfd.template.tree</field>
+        <field name="model">pdfd.template</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name" />
+                <field name="key" />
+            </list>
+        </field>
+    </record>
+
+    <!-- form -->
+    <record id="view_pdfd_template_form" model="ir.ui.view">
+        <field name="name">pdfd.template.form</field>
+        <field name="model">pdfd.template</field>
+        <field name="arch" type="xml">
+            <form string="PDF Designer Lite">
+                <sheet>
+                    <header>
+                        <button
+                            name="action_generate_xml"
+                            type="object"
+                            string="Generate XML"
+                            class="oe_highlight"
+                        />
+                        <button
+                            name="action_export_xml"
+                            type="object"
+                            string="Export XML"
+                        />
+                    </header>
+                    <group>
+                        <field name="name" />
+                        <field name="key" />
+                    </group>
+                    <group string="Layout Options" col="4">
+                        <field name="show_logo" />
+                        <field name="title_text" />
+                        <field name="title_align" />
+                        <field name="show_header_fields" />
+                        <field name="show_table" />
+                        <field name="show_totals" />
+                        <field name="footer_text" />
+                    </group>
+                    <notebook>
+                        <page string="Preview">
+                            <field name="preview_html" widget="html" nolabel="1" />
+                        </page>
+                        <page string="XML">
+                            <field name="xml_arch" nolabel="1" />
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- the action the menu will call -->
+    <record id="action_pdfd_templates" model="ir.actions.act_window">
+        <field name="name">PDF Templates</field>
+        <field name="res_model">pdfd.template</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
