@@ -1,0 +1,212 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* sensible_dynamic_portal
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 19.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-12-26 05:16+0000\n"
+"PO-Revision-Date: 2025-12-26 05:16+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: sensible_dynamic_portal
+#: model_terms:ir.ui.view,arch_db:sensible_dynamic_portal.sbl_portal_my_detail
+msgid "<i class=\"fa fa-print me-1\"/>Download"
+msgstr "<i class=\"fa fa-print me-1\"/>Baixar"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__active
+msgid "Active"
+msgstr "Ativo"
+
+#. module: sensible_dynamic_portal
+#: model_terms:ir.ui.view,arch_db:sensible_dynamic_portal.sbl_dynamic_portal_form_view
+#: model_terms:ir.ui.view,arch_db:sensible_dynamic_portal.sbl_dynamic_portal_search_view
+msgid "Archived"
+msgstr "Arquivado"
+
+#. module: sensible_dynamic_portal
+#: model_terms:ir.ui.view,arch_db:sensible_dynamic_portal.sbl_portal_my_detail
+msgid "Communication history"
+msgstr "Histórico de comunicação"
+
+#. module: sensible_dynamic_portal
+#. odoo-python
+#: code:addons/sensible_dynamic_portal/controllers/sbl_main.py:0
+msgid "Create Date"
+msgstr "Data de Criação"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__create_uid
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__create_uid
+msgid "Created by"
+msgstr "Criado por"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__create_date
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__create_date
+msgid "Created on"
+msgstr "Criado em"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__sbl_display_currency
+msgid "Display Currency"
+msgstr "Moeda de Exibição"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__display_name
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__display_name
+msgid "Display Name"
+msgstr "Nome de Exibição"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,help:sensible_dynamic_portal.field_sbl_dynamic_portal__sbl_report_id
+msgid "Display as detailed view"
+msgstr "Exibir como visão detalhada"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__sbl_domain
+msgid "Domain"
+msgstr "Domínio"
+
+#. module: sensible_dynamic_portal
+#: model_terms:ir.ui.view,arch_db:sensible_dynamic_portal.sbl_portal_my_detail
+msgid "Download"
+msgstr "Baixar"
+
+#. module: sensible_dynamic_portal
+#: model:ir.actions.act_window,name:sensible_dynamic_portal.sbl_dynamic_portal_action
+#: model:ir.model,name:sensible_dynamic_portal.model_sbl_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__sbl_dynamic_portal_id
+#: model:ir.ui.menu,name:sensible_dynamic_portal.sbl_dynamic_portal_menu
+#: model:ir.ui.menu,name:sensible_dynamic_portal.sbl_dynamic_portal_parent
+msgid "Dynamic Portal"
+msgstr "Portal Dinâmico"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model,name:sensible_dynamic_portal.model_sbl_dynamic_portal_line
+msgid "Dynamic Portal Line"
+msgstr "Linha do Portal Dinâmico"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.constraint,message:sensible_dynamic_portal.constraint_sbl_dynamic_portal_uniq_name_model
+msgid "Each model must have a unique name/model."
+msgstr "Cada modelo deve ter um nome/modelo único."
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__sbl_field_id
+msgid "Field"
+msgstr "Campo"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__sbl_field_line
+#: model_terms:ir.ui.view,arch_db:sensible_dynamic_portal.sbl_dynamic_portal_form_view
+msgid "Fields"
+msgstr "Campos"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__id
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__id
+msgid "ID"
+msgstr ""
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__image_1920
+msgid "Image"
+msgstr "Imagem"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__image_1024
+msgid "Image 1024"
+msgstr "Imagem 1024"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__image_128
+msgid "Image 128"
+msgstr "Imagem 128"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__image_256
+msgid "Image 256"
+msgstr "Imagem 256"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__image_512
+msgid "Image 512"
+msgstr "Imagem 512"
+
+#. module: sensible_dynamic_portal
+#. odoo-python
+#: code:addons/sensible_dynamic_portal/controllers/sbl_main.py:0
+msgid "Invalid report type: %s"
+msgstr "Tipo de relatório inválido: %s"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__write_uid
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__write_uid
+msgid "Last Updated by"
+msgstr "Última atualização por"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__write_date
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__write_date
+msgid "Last Updated on"
+msgstr "Última atualização em"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__sbl_model_id
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__sbl_model_id
+msgid "Model"
+msgstr "Modelo"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__sbl_model_name
+msgid "Model Name"
+msgstr "Nome do Modelo"
+
+#. module: sensible_dynamic_portal
+#. odoo-python
+#: code:addons/sensible_dynamic_portal/controllers/sbl_main.py:0
+msgid "Multi company reports are not supported."
+msgstr "Relatórios multiempresa não são suportados."
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__name
+msgid "Name"
+msgstr "Nome"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__sbl_report_id
+msgid "Report"
+msgstr "Relatório"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__sequence
+msgid "Sequence"
+msgstr "Sequência"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal__sbl_sortby_ids
+msgid "Sort By"
+msgstr "Ordenar Por"
+
+#. module: sensible_dynamic_portal
+#: model_terms:ir.ui.view,arch_db:sensible_dynamic_portal.sbl_portal_my_details
+msgid "There are currently no records."
+msgstr "Atualmente não há registros."
+
+#. module: sensible_dynamic_portal
+#: model_terms:ir.ui.view,arch_db:sensible_dynamic_portal.sbl_dynamic_portal_form_view
+msgid "Title"
+msgstr "Título"
+
+#. module: sensible_dynamic_portal
+#: model:ir.model.fields,field_description:sensible_dynamic_portal.field_sbl_dynamic_portal_line__sbl_ttype
+msgid "Type"
+msgstr "Tipo"
