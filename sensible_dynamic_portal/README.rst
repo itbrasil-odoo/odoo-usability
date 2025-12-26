@@ -1,6 +1,6 @@
-.. image:: https://odoo-community.org/readme-banner-image
-   :target: https://odoo-community.org/get-involved?utm_source=readme
-   :alt: Odoo Community Association
+.. image:: https://itbrasil.com.br/web/image/24368-93015bbb/readme-banner-image.png
+   :target: https://itbrasil.com.br
+   :alt: IT Brasil
 
 ==============
 Dynamic Portal
