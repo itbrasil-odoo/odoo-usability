@@ -5,7 +5,7 @@ load-plugins=pylint_odoo
 score=n
 
 [ODOOLINT]
-readme-template-url="https://github.com/OCA/maintainer-tools/blob/master/template/module/README.rst"
+readme-template-url="https://github.com/itbrasil-odoo/maintainer-tools/blob/master/template/module/README.rst"
 manifest-required-authors=IT Brasil
 manifest-required-keys=license
 manifest-deprecated-keys=description,active

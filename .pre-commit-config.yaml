@@ -42,14 +42,14 @@ repos:
     rev: v1.3
     hooks:
       - id: whool-init
-  - repo: https://github.com/oca/maintainer-tools
-    rev: f9b919b9868143135a9c9cb03021089cabba8223
+  - repo: https://github.com/itbrasil-odoo/maintainer-tools
+    rev: 1ecbf21cbfbd3a282da3c75bbd755173b8b86e6f
     hooks:
       # update the NOT INSTALLABLE ADDONS section above
-      - id: oca-update-pre-commit-excluded-addons
-      - id: oca-fix-manifest-website
+      - id: itbr-update-pre-commit-excluded-addons
+      - id: itbr-fix-manifest-website
         args: ["https://github.com/itbrasil-odoo/odoo-usability"]
-      - id: oca-gen-addon-readme
+      - id: itbr-gen-addon-readme
         args:
           - --addons-dir=.
           - --branch=19.0
@@ -58,7 +58,7 @@ repos:
           - --if-source-changed
           - --keep-source-digest
           - --convert-fragments-to-markdown
-      - id: oca-gen-external-dependencies
+      - id: itbr-gen-external-dependencies
   - repo: https://github.com/OCA/odoo-pre-commit-hooks
     rev: v0.1.6
     hooks:
