@@ -69,6 +69,14 @@ Authors
 Maintainers
 -----------
 
+.. |maintainer-renanteixeira| image:: https://github.com/renanteixeira.png?size=40px
+    :target: https://github.com/renanteixeira
+    :alt: renanteixeira
+
+Current maintainer:
+
+|maintainer-renanteixeira| 
+
 This module is part of the `itbrasil-odoo/odoo-usability <https://github.com/itbrasil-odoo/odoo-usability/tree/19.0/sensible_dynamic_portal>`_ project on GitHub.
 
 You are welcome to contribute.
