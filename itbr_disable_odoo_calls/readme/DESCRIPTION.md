@@ -1,0 +1,1 @@
+Blocks all outbound communication with *.odoo.com servers, including calls to Odoo's telemetry and update servers. This extension is useful for users who want to prevent any data from being sent to Odoo's servers, ensuring greater privacy and control over their data.
