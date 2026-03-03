@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="pdfd_builder" name="PDF Designer Lite Builder">
+        <t t-call="web.layout">
+            <t t-set="head">
+                <t t-call-assets="web.assets_frontend" />
+                <t t-call-assets="html_builder.assets" />
+            </t>
+            <div
+                class="container o_web_editor"
+                t-att-data-template-id="template.id"
+                id="pdfd_container"
+            >
+                <div class="d-flex justify-content-between align-items-center my-3">
+                    <h3 class="mb-0">
+                        PDFD Builder - <t t-esc="template.name" />
+                    </h3>
+                    <div class="d-flex gap-2">
+                        <button
+                            class="btn btn-secondary"
+                            type="button"
+                            onclick="window.location.reload()"
+                        >
+                            Recarregar
+                        </button>
+                        <button
+                            class="btn btn-primary"
+                            type="button"
+                            id="pdfd_save_btn"
+                        >
+                            Salvar
+                        </button>
+                    </div>
+                </div>
+                <div
+                    id="pdfd_oe_structure_editor"
+                    class="oe_structure o_editable o_safe_snippets"
+                    data-oe-model="pdfd.template"
+                    t-att-data-oe-id="template.id"
+                    data-oe-field="xml_arch"
+                    contenteditable="true"
+                >
+                    <t t-if="body">
+                        <t t-out="Markup(body)" />
+                    </t>
+                    <t t-else="">
+                        <div class="row">
+                            <div class="col-12">
+                                <h2 t-esc="template.title_text or 'Título'" />
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <strong>Campo</strong>
+                            </div>
+                            <div class="col-6">Valor</div>
+                        </div>
+                    </t>
+                </div>
+            </div>
+            <script
+                type="text/javascript"
+            ><![CDATA[
+                (function () {
+                    const btn = document.getElementById('pdfd_save_btn');
+                    if (!btn) return;
+                    const container = document.getElementById('pdfd_container');
+                    const templateId = (container && container.getAttribute("data-template-id")) || "";
+                    btn.addEventListener('click', async () => {
+                        const editor = document.getElementById('pdfd_oe_structure_editor');
+                        if (!editor) return;
+                        const html = editor.innerHTML;
+                        btn.disabled = true;
+                        try {
+                            await fetch(`/pdfd_lite/builder/${templateId}/save`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    "X-Openerp-Session-Id": odoo.session_info.session_id,
+                                },
+                                body: JSON.stringify({ html }),
+                            });
+                            alert("Salvo com sucesso. Reabra o relatório para ver o efeito.");
+                        } catch (e) {
+                            console.error(e);
+                            alert("Falha ao salvar.");
+                        } finally {
+                            btn.disabled = false;
+                        }
+                    });
+                })();
+            ]]></script>
+        </t>
+    </template>
+</odoo>

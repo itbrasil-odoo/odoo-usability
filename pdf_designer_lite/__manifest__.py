@@ -6,9 +6,10 @@
     "license": "LGPL-3",
     "author": "Odooistic, IT Brasil",
     "website": "https://github.com/itbrasil-odoo/odoo-usability",
-    "depends": ["base", "web", "mail"],
+    "depends": ["base", "web", "mail", "html_builder"],
     "data": [
         "security/ir.model.access.csv",
+        "views/pdfd_builder_templates.xml",
         "views/pdfd_template_views.xml",
         "views/pdfd_menu.xml",
     ],

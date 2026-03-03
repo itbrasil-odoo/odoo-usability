@@ -52,6 +52,16 @@
                         <page string="XML">
                             <field name="xml_arch" nolabel="1" />
                         </page>
+                        <page string="Builder">
+                            <button
+                                string="Abrir construtor"
+                                type="object"
+                                icon="fa-edit"
+                                name="action_open_builder"
+                                class="btn-primary"
+                            />
+                            <field name="pdf_view_id" readonly="1" />
+                        </page>
                     </notebook>
                 </sheet>
             </form>

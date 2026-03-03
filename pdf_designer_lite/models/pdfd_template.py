@@ -287,3 +287,11 @@ class PdfdTemplate(models.Model):
             "url": f"/pdfd_lite/export/{self.id}",
             "target": "self",
         }
+
+    def action_open_builder(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_url",
+            "url": f"/pdfd_lite/builder/{self.id}",
+            "target": "new",
+        }
