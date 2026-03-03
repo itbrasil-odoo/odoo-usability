@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="sale_order_view_form_inherit_sale_hide_price" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.sale.hide.price</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form" />
+        <field name="arch" type="xml">
+            <group name="sales_person" position="after">
+                <group name="portal_pdf_visibility" string="Portal / PDF">
+                    <field name="show_portal_values" />
+                    <field name="show_portal_so_total_amount" />
+                </group>
+            </group>
+        </field>
+    </record>
+</odoo>

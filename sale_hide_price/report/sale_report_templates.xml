@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <template
+        id="report_saleorder_document_inherit_sale_hide_price"
+        inherit_id="sale.report_saleorder_document"
+    >
+        <xpath expr="//t[@t-set='display_discount']" position="before">
+            <t t-set="show_line_values" t-value="doc.show_portal_values" />
+            <t t-set="show_total_amount" t-value="doc.show_portal_so_total_amount" />
+        </xpath>
+        <xpath expr="//t[@t-set='display_discount']" position="attributes">
+            <attribute name="t-value">
+                show_line_values and any(line.discount for line in lines_to_report)
+            </attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_priceunit']" position="attributes">
+            <attribute name="t-if">show_line_values</attribute>
+        </xpath>
+        <xpath expr="//th[@name='th_subtotal']" position="attributes">
+            <attribute name="t-if">show_line_values</attribute>
+        </xpath>
+        <xpath expr="//t[@t-set='section_name_colspan']" position="attributes">
+            <attribute name="t-value">
+                2
+                + (1 if show_line_values else 0)
+                + (1 if display_discount else 0)
+                + (1 if display_taxes else 0)
+            </attribute>
+        </xpath>
+        <xpath expr="//t[@t-if='not show_section_total']" position="attributes">
+            <attribute
+                name="t-if"
+            >not (show_line_values and show_section_total)</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_section_price']" position="attributes">
+            <attribute name="t-if">show_line_values and show_section_total</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_combo_name']" position="attributes">
+            <attribute name="t-att-colspan">
+                2
+                + (1 if show_line_values else 0)
+                + (1 if display_discount else 0)
+                + (1 if display_taxes else 0)
+            </attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_combo_price']" position="attributes">
+            <attribute name="t-if">show_line_values</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_product_priceunit']" position="attributes">
+            <attribute name="t-if">show_line_values</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_product_subtotal']" position="attributes">
+            <attribute
+                name="t-if"
+            >show_line_values and not line.is_downpayment</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_section_group_priceunit']" position="attributes">
+            <attribute name="t-if">show_line_values</attribute>
+        </xpath>
+        <xpath expr="//td[@name='td_section_group_total']" position="attributes">
+            <attribute name="t-if">show_line_values</attribute>
+        </xpath>
+        <xpath expr="//div[@name='so_total_summary']" position="attributes">
+            <attribute name="t-if">show_total_amount</attribute>
+        </xpath>
+    </template>
+</odoo>
