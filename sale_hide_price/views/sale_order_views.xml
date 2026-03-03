@@ -5,11 +5,9 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form" />
         <field name="arch" type="xml">
-            <group name="sales_person" position="after">
-                <group name="portal_pdf_visibility" string="Portal / PDF">
-                    <field name="show_portal_values" />
-                    <field name="show_portal_so_total_amount" />
-                </group>
+            <group name="order_details" position="inside">
+                <field name="show_portal_values" widget="boolean_toggle" />
+                <field name="show_portal_so_total_amount" widget="boolean_toggle" />
             </group>
         </field>
     </record>
