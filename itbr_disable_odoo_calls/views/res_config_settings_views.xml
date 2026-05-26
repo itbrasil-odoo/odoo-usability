@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.itbr.disable.odoo.calls</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="base_setup.action_general_configuration"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <app
+                    string="IT Brasil"
+                    name="itbr_disable_odoo_calls"
+                    groups="base.group_system"
+                >
+                    <block title="Comunicações Externas">
+                        <setting
+                            string="Bloquear comunicações com Odoo Enterprise"
+                            help="Impede chamadas para apps.odoo.com e services.odoo.com. O Avalara Brasil (NF-e/NFS-e) continua funcionando normalmente."
+                        >
+                            <field name="itbr_disable_odoo_calls_enabled" />
+                        </setting>
+                    </block>
+                </app>
+            </xpath>
+        </field>
+    </record>
+</odoo>

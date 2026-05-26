@@ -8,9 +8,15 @@
 import logging
 
 from odoo import api, models
-from odoo.tools import ormcache
 
 _logger = logging.getLogger(__name__)
+
+
+def _is_blocking_enabled(env):
+    val = env["ir.config_parameter"].sudo().get_param(
+        "itbr_disable_odoo_calls.enabled", "1"
+    )
+    return val != "0"
 
 
 class _MockAppsResponse:
@@ -28,18 +34,20 @@ class IrModuleModule(models.Model):
     _inherit = "ir.module.module"
 
     @api.model
-    @ormcache("payload")
     def _call_apps(self, payload):
         """Override: block outbound request to https://apps.odoo.com."""
+        if not _is_blocking_enabled(self.env):
+            return super()._call_apps(payload)
         _logger.warning(
             "itbr_disable_odoo_calls: blocked _call_apps request to apps.odoo.com"
         )
         return _MockAppsResponse()
 
     @api.model
-    @ormcache()
     def _get_industry_categories_from_apps(self):
         """Override: block outbound request to https://apps.odoo.com."""
+        if not _is_blocking_enabled(self.env):
+            return super()._get_industry_categories_from_apps()
         _logger.warning(
             "itbr_disable_odoo_calls: blocked _get_industry_categories_from_apps "
             "request to apps.odoo.com"

@@ -12,6 +12,13 @@ from odoo import api, models
 _logger = logging.getLogger(__name__)
 
 
+def _is_blocking_enabled(env):
+    val = env["ir.config_parameter"].sudo().get_param(
+        "itbr_disable_odoo_calls.enabled", "1"
+    )
+    return val != "0"
+
+
 class PublisherWarrantyContract(models.AbstractModel):
     _inherit = "publisher_warranty.contract"
 
@@ -21,6 +28,8 @@ class PublisherWarrantyContract(models.AbstractModel):
         minimal valid response so that update_notification() can complete
         without errors.
         """
+        if not _is_blocking_enabled(self.env):
+            return super()._get_sys_logs()
         _logger.info(
             "itbr_disable_odoo_calls: blocked _get_sys_logs call to services.odoo.com"
         )
@@ -28,6 +37,8 @@ class PublisherWarrantyContract(models.AbstractModel):
 
     def update_notification(self, cron_mode=True):
         """Override: skip all remote communication and return success."""
+        if not _is_blocking_enabled(self.env):
+            return super().update_notification(cron_mode=cron_mode)
         _logger.info(
             "itbr_disable_odoo_calls: blocked update_notification call "
             "to services.odoo.com"

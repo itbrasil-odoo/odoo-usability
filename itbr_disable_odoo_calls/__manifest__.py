@@ -4,7 +4,7 @@
 {
     "name": "Disable Odoo External Calls",
     "summary": "Blocks all outbound communication with *.odoo.com servers",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.1.0",
     "author": "IT Brasil",
     "website": "https://github.com/itbrasil-odoo/odoo-usability",
     "license": "LGPL-3",
@@ -15,7 +15,9 @@
         "iap",
         "base_import_module",
     ],
-    "data": [],
+    "data": [
+        "views/res_config_settings_views.xml",
+    ],
     "demo": [],
     "installable": True,
     "auto_install": False,
