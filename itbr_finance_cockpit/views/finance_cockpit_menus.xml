@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--
+      App próprio, separado de Contabilidade de propósito: o objetivo é que
+      sócio e administrativo tenham um lugar só, com cinco entradas, em vez de
+      navegar pela árvore contábil.
+
+      "Tesouraria", e não "Financeiro": em pt_BR o próprio módulo contábil do
+      Odoo se chama Financeiro, e ficava vizinho do nosso na lista de apps,
+      junto de Faturamento — três entradas seguidas falando de dinheiro, e a
+      pergunta "em qual eu clico?" toda vez.
+    -->
+    <menuitem id="menu_finance_cockpit_root"
+              name="Tesouraria"
+              sequence="40"
+              groups="itbr_finance_cockpit.group_finance_viewer,account.group_account_invoice"/>
+
+    <menuitem id="menu_finance_cockpit_overview"
+              name="Painel do Sócio"
+              parent="menu_finance_cockpit_root"
+              action="action_finance_cockpit_overview"
+              sequence="10"
+              groups="itbr_finance_cockpit.group_finance_viewer"/>
+
+    <menuitem id="menu_finance_cockpit_cash_flow"
+              name="Fluxo de Caixa"
+              parent="menu_finance_cockpit_root"
+              action="action_finance_cockpit_cash_flow"
+              sequence="20"
+              groups="itbr_finance_cockpit.group_finance_viewer"/>
+
+    <menuitem id="menu_finance_cockpit_receivable"
+              name="A Receber"
+              parent="menu_finance_cockpit_root"
+              action="action_finance_cockpit_receivable"
+              sequence="30"/>
+
+    <menuitem id="menu_finance_cockpit_payable"
+              name="A Pagar"
+              parent="menu_finance_cockpit_root"
+              action="action_finance_cockpit_payable"
+              sequence="40"/>
+
+    <menuitem id="menu_finance_cockpit_new_invoice"
+              name="Nova Fatura"
+              parent="menu_finance_cockpit_root"
+              action="action_finance_cockpit_new_invoice"
+              sequence="50"
+              groups="account.group_account_invoice"/>
+
+    <!--
+      Configuração vive aqui, e não em Ajustes, porque quem precisa dela é quem
+      administra o financeiro do cliente — e vai rodá-la em produção.
+    -->
+    <menuitem id="menu_finance_cockpit_config"
+              name="Configuração"
+              parent="menu_finance_cockpit_root"
+              sequence="90"
+              groups="account.group_account_manager"/>
+
+    <menuitem id="menu_finance_cockpit_receivable_setup"
+              name="Conta a receber padrão"
+              parent="menu_finance_cockpit_config"
+              action="action_finance_receivable_setup"
+              sequence="10"
+              groups="account.group_account_manager"/>
+</odoo>

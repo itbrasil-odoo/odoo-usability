@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Painel do Sócio: KPIs consolidados das empresas ativas -->
+    <record id="action_finance_cockpit_overview" model="ir.actions.client">
+        <field name="name">Painel do Sócio</field>
+        <field name="tag">itbr_finance_cockpit.Overview</field>
+        <field name="path">painel-socio</field>
+    </record>
+
+    <!-- Fluxo de caixa projetado: o que o Odoo 19 não entrega -->
+    <record id="action_finance_cockpit_cash_flow" model="ir.actions.client">
+        <field name="name">Fluxo de Caixa Projetado</field>
+        <field name="tag">itbr_finance_cockpit.CashFlow</field>
+        <field name="path">fluxo-de-caixa</field>
+    </record>
+
+    <!-- Contas a receber: lista direta, sem passar pelo módulo contábil -->
+    <record id="action_finance_cockpit_receivable" model="ir.actions.act_window">
+        <field name="name">A Receber</field>
+        <field name="res_model">account.move</field>
+        <field name="path">a-receber</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type', 'in', ('out_invoice', 'out_refund')), ('state', '=', 'posted'), ('payment_state', 'in', ('not_paid', 'partial'))]</field>
+        <field name="context">{'search_default_filter_overdue': 1}</field>
+        <field name="search_view_id" ref="view_finance_cockpit_move_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'sequence': 1, 'view_mode': 'list', 'view_id': ref('view_finance_cockpit_move_list')}),
+            (0, 0, {'sequence': 2, 'view_mode': 'form', 'view_id': ref('view_move_form_simplified')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nada a receber em aberto.</p>
+            <p>Aqui ficam as faturas de cliente confirmadas que ainda não foram pagas.</p>
+        </field>
+    </record>
+
+    <record id="action_finance_cockpit_payable" model="ir.actions.act_window">
+        <field name="name">A Pagar</field>
+        <field name="res_model">account.move</field>
+        <field name="path">a-pagar</field>
+        <field name="view_mode">list,form</field>
+        <field name="domain">[('move_type', 'in', ('in_invoice', 'in_refund')), ('state', '=', 'posted'), ('payment_state', 'in', ('not_paid', 'partial'))]</field>
+        <field name="context">{'search_default_filter_overdue': 1}</field>
+        <field name="search_view_id" ref="view_finance_cockpit_move_search"/>
+        <field name="view_ids" eval="[(5, 0, 0),
+            (0, 0, {'sequence': 1, 'view_mode': 'list', 'view_id': ref('view_finance_cockpit_move_list')})]"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Nada a pagar em aberto.</p>
+            <p>Aqui ficam as contas de fornecedor confirmadas que ainda não foram pagas.</p>
+        </field>
+    </record>
+
+    <!-- Fatura simplificada: formulário enxuto, sem os campos fiscais e contábeis -->
+    <record id="action_finance_cockpit_new_invoice" model="ir.actions.act_window">
+        <field name="name">Nova Fatura</field>
+        <field name="res_model">account.move</field>
+        <field name="path">fatura-simples</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_move_form_simplified"/>
+        <field name="context">{'default_move_type': 'out_invoice'}</field>
+    </record>
+
+</odoo>

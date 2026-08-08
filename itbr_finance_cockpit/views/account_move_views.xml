@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Busca com os filtros que o administrativo usa de fato: o que venceu,
+         o que vence hoje e o que vence nesta semana. -->
+    <record id="view_finance_cockpit_move_search" model="ir.ui.view">
+        <field name="name">account.move.search.finance.cockpit</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <search string="Contas">
+                <field name="partner_id" string="Parceiro"/>
+                <field name="name" string="Documento"/>
+                <field name="invoice_date_due" string="Vencimento"/>
+                <filter name="filter_overdue" string="Vencidas"
+                        domain="[('invoice_date_due', '&lt;', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_today" string="Vencem hoje"
+                        domain="[('invoice_date_due', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                <filter name="filter_week" string="Vencem em 7 dias"
+                        domain="[('invoice_date_due', '&gt;=', context_today().strftime('%Y-%m-%d')),
+                                 ('invoice_date_due', '&lt;=', (context_today() + relativedelta(days=7)).strftime('%Y-%m-%d'))]"/>
+                <separator/>
+                <filter name="filter_partial" string="Parcialmente pagas" domain="[('payment_state', '=', 'partial')]"/>
+                <group>
+                    <filter name="group_partner" string="Parceiro" domain="[]" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_due" string="Vencimento" domain="[]" context="{'group_by': 'invoice_date_due'}"/>
+                    <filter name="group_company" string="Empresa" domain="[]" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <!-- Lista enxuta: só o que importa para cobrar ou pagar. -->
+    <record id="view_finance_cockpit_move_list" model="ir.ui.view">
+        <field name="name">account.move.list.finance.cockpit</field>
+        <field name="model">account.move</field>
+        <field name="arch" type="xml">
+            <list string="Contas" create="0" decoration-danger="invoice_date_due and invoice_date_due &lt; current_date">
+                <field name="invoice_date_due" string="Vence em"/>
+                <field name="partner_id" string="Parceiro"/>
+                <field name="name" string="Documento"/>
+                <field name="company_id" string="Empresa" groups="base.group_multi_company"/>
+                <field name="amount_total" string="Total" sum="Total"/>
+                <field name="amount_residual" string="Em aberto" sum="Em aberto"/>
+                <field name="payment_state" string="Situação" widget="badge"/>
+                <field name="currency_id" column_invisible="1"/>
+                <button name="action_register_payment" type="object" string="Registrar pagamento"
+                        icon="fa-money" class="btn-link"/>
+            </list>
+        </field>
+    </record>
+
+    <!--
+      Fatura simplificada.
+
+      View PRIMÁRIA (não herança): o formulário padrão de account.move carrega
+      ~170 campos e ainda recebe 15 a 20 campos fiscais de l10n_br_avatax e
+      l10n_br_edi. Aqui ficam só parceiro, datas, itens e total.
+
+      Os campos técnicos abaixo são invisíveis mas precisam existir: os onchange
+      e o js_class account_move_form dependem deles para calcular imposto,
+      diário e moeda. Removê-los quebra o cálculo silenciosamente.
+    -->
+    <record id="view_move_form_simplified" model="ir.ui.view">
+        <field name="name">account.move.form.simplified</field>
+        <field name="model">account.move</field>
+        <field name="priority">99</field>
+        <field name="arch" type="xml">
+            <form string="Fatura" js_class="account_move_form">
+                <header>
+                    <button name="action_post" type="object" string="Confirmar"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_register_payment" type="object" string="Registrar pagamento"
+                            class="btn-primary"
+                            invisible="state != 'posted' or payment_state not in ('not_paid', 'partial')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,posted"/>
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" readonly="state != 'draft'" placeholder="Rascunho"/></h1>
+                    </div>
+
+                    <!-- técnicos: invisíveis, porém necessários aos onchange -->
+                    <field name="move_type" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="company_currency_id" invisible="1"/>
+                    <field name="suitable_journal_ids" invisible="1"/>
+                    <field name="journal_id" invisible="1"/>
+                    <field name="commercial_partner_id" invisible="1"/>
+                    <field name="payment_state" invisible="1"/>
+                    <field name="quick_edit_mode" invisible="1"/>
+
+                    <group>
+                        <group>
+                            <field name="partner_id" string="Cliente" widget="res_partner_many2one"
+                                   readonly="state != 'draft'"/>
+                            <field name="invoice_payment_term_id" string="Condição de pagamento"
+                                   readonly="state != 'draft'"/>
+                        </group>
+                        <group>
+                            <field name="invoice_date" string="Data" readonly="state != 'draft'"/>
+                            <field name="invoice_date_due" string="Vencimento" readonly="state != 'draft'"/>
+                            <field name="payment_reference" string="Referência"/>
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Itens" name="items">
+                            <field name="invoice_line_ids" widget="section_and_note_one2many"
+                                   readonly="state != 'draft'"
+                                   context="{'default_move_type': move_type}">
+                                <list editable="bottom">
+                                    <field name="product_id" string="Produto/Serviço"/>
+                                    <field name="name" string="Descrição"/>
+                                    <field name="quantity" string="Qtd"/>
+                                    <field name="price_unit" string="Preço"/>
+                                    <field name="tax_ids" widget="many2many_tags" string="Impostos"
+                                           options="{'no_create': True}"/>
+                                    <field name="price_subtotal" string="Subtotal"/>
+                                    <field name="currency_id" column_invisible="1"/>
+                                    <field name="company_id" column_invisible="1"/>
+                                    <field name="display_type" column_invisible="1"/>
+                                </list>
+                            </field>
+
+                            <group class="oe_subtotal_footer oe_right">
+                                <field name="amount_untaxed" string="Subtotal"/>
+                                <field name="amount_tax" string="Impostos"/>
+                                <field name="amount_total" string="Total" class="oe_subtotal_footer_separator"/>
+                                <field name="amount_residual" string="Em aberto"
+                                       invisible="state != 'posted'"/>
+                            </group>
+                        </page>
+                        <page string="Observações" name="notes">
+                            <field name="narration" placeholder="Observações que saem na fatura"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+</odoo>

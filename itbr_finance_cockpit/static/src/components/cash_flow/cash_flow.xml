@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="itbr_finance_cockpit.CashFlow">
+        <div class="d-flex flex-column h-100 o_finance_cockpit">
+            <ControlPanel/>
+
+            <div class="flex-grow-1 overflow-auto o_content p-3">
+                <t t-if="state.loading">
+                    <div class="text-center text-muted p-5">Carregando…</div>
+                </t>
+                <t t-else="">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="text-muted small">Horizonte:</span>
+                        <div class="btn-group btn-group-sm">
+                            <button t-foreach="[4, 13, 26]" t-as="option" t-key="option"
+                                    class="btn"
+                                    t-att-class="state.weeks === option ? 'btn-primary' : 'btn-outline-primary'"
+                                    t-on-click="() => this.setHorizon(option)">
+                                <t t-esc="option"/> semanas
+                            </button>
+                        </div>
+                    </div>
+
+                    <t t-if="state.data.first_negative">
+                        <div class="alert alert-danger">
+                            <span class="fw-bold">Caixa fica negativo em <t t-esc="date(state.data.first_negative)"/>.</span>
+                            Considerando só o que já está lançado, sem novas vendas.
+                        </div>
+                    </t>
+
+                    <t t-if="hasOverdue">
+                        <div class="alert alert-warning">
+                            <span class="fw-bold">Em atraso, fora da projeção:</span>
+                            a receber <t t-esc="money(state.data.overdue_in)"/>,
+                            a pagar <t t-esc="money(state.data.overdue_out)"/>.
+                            Esses valores já venceram e não entram nas semanas abaixo.
+                        </div>
+                    </t>
+
+                    <t t-if="state.data.already_advanced">
+                        <div class="alert alert-info">
+                            <span class="fw-bold">Fora da projeção por já ter virado caixa:</span>
+                            <t t-esc="money(state.data.already_advanced)"/> em títulos antecipados
+                            com regresso. O dinheiro entrou na antecipação; o título segue aberto
+                            porque o risco continua aqui, mas contá-lo de novo no vencimento
+                            prometeria a mesma entrada duas vezes.
+                        </div>
+                    </t>
+
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between">
+                            <span class="fw-bold">Projeção semanal</span>
+                            <span class="text-muted">Saldo inicial: <t t-esc="money(state.data.opening)"/></span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Semana</th>
+                                        <th class="text-end">Entradas</th>
+                                        <th class="text-end">Saídas</th>
+                                        <th class="text-end">Resultado</th>
+                                        <th class="text-end">Saldo projetado</th>
+                                        <th style="width: 25%;">Movimento</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="state.data.buckets" t-as="bucket" t-key="bucket.start"
+                                        t-att-class="bucket.balance &lt; 0 ? 'table-danger' : ''">
+                                        <td>
+                                            <t t-esc="date(bucket.start)"/>
+                                            <span class="text-muted small"> a <t t-esc="date(bucket.end)"/></span>
+                                        </td>
+                                        <td class="text-end text-success" t-esc="bucket.in ? money(bucket.in) : '—'"/>
+                                        <td class="text-end text-danger" t-esc="bucket.out ? money(bucket.out) : '—'"/>
+                                        <td class="text-end"
+                                            t-att-class="bucket.net &lt; 0 ? 'text-danger' : ''"
+                                            t-esc="bucket.net ? money(bucket.net) : '—'"/>
+                                        <td class="text-end fw-bold"
+                                            t-att-class="bucket.balance &lt; 0 ? 'text-danger' : ''"
+                                            t-esc="money(bucket.balance)"/>
+                                        <td>
+                                            <div class="d-flex flex-column gap-1">
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-success"
+                                                         t-att-style="'width: ' + barWidth(bucket.in)"/>
+                                                </div>
+                                                <div class="progress" style="height: 6px;">
+                                                    <div class="progress-bar bg-danger"
+                                                         t-att-style="'width: ' + barWidth(bucket.out)"/>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+
+</templates>

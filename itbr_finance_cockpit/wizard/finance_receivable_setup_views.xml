@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!--
+      O texto desta tela é a entrega, tanto quanto o código: quem roda isto em
+      produção precisa entender o que muda antes de apertar o botão.
+    -->
+    <record id="view_finance_receivable_setup_form" model="ir.ui.view">
+        <field name="name">itbr.finance.receivable.setup.form</field>
+        <field name="model">itbr.finance.receivable.setup</field>
+        <field name="arch" type="xml">
+            <form string="Conta a receber padrão">
+                <field name="state" invisible="1"/>
+
+                <div invisible="state != 'draft'">
+                    <div class="alert alert-info" role="alert">
+                        Toda fatura de cliente gera uma parcela "a receber", e a conta contábil
+                        dessa parcela vem desta configuração. Se ela apontar para uma conta
+                        técnica (trânsito, numerários), o razão de clientes não existe e a
+                        cobrança passa a olhar para o lugar errado.
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="company_id" options="{'no_create': True}"/>
+                            <field name="current_account_id" readonly="1"
+                                   options="{'no_open': True}"/>
+                        </group>
+                        <group>
+                            <field name="account_id" required="1" options="{'no_create': True}"/>
+                        </group>
+                    </group>
+
+                    <group string="O que já foi postado">
+                        <field name="reclassify"/>
+                        <field name="batch_size" invisible="not reclassify"/>
+                        <field name="line_count" invisible="1"/>
+                        <field name="move_count" invisible="1"/>
+                    </group>
+
+                    <div invisible="not reclassify">
+                        <div class="text-muted small mb-2">
+                            Reclassificar troca apenas a conta contábil da parcela. Valor, data,
+                            parceiro e nota fiscal permanecem. Parcelas já conciliadas ficam de
+                            fora: mexer nelas desfaria a baixa.
+                        </div>
+                        <field name="preview_html" readonly="1" nolabel="1"/>
+                    </div>
+                </div>
+
+                <div invisible="state != 'done'">
+                    <field name="remaining_moves" invisible="1"/>
+                    <field name="can_continue" invisible="1"/>
+                    <field name="result_html" readonly="1" nolabel="1"/>
+                </div>
+
+                <footer>
+                    <button name="action_apply" type="object" string="Aplicar"
+                            class="btn-primary" invisible="state != 'draft'"
+                            confirm="Confirma a alteração da conta a receber padrão desta empresa?"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"
+                            invisible="state != 'draft'"/>
+                    <button name="action_continue" type="object" string="Continuar"
+                            class="btn-primary" invisible="state != 'done' or not can_continue"/>
+                    <button string="Fechar" class="btn-secondary" special="cancel"
+                            invisible="state != 'done'"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_finance_receivable_setup" model="ir.actions.act_window">
+        <field name="name">Conta a receber padrão</field>
+        <field name="res_model">itbr.finance.receivable.setup</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+</odoo>

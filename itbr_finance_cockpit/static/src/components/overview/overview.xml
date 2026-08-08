@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="itbr_finance_cockpit.Overview">
+        <div class="d-flex flex-column h-100 o_finance_cockpit">
+            <ControlPanel/>
+
+            <div class="flex-grow-1 overflow-auto o_content p-3">
+                <t t-if="state.loading">
+                    <div class="text-center text-muted p-5">Carregando…</div>
+                </t>
+                <t t-else="">
+                    <div class="text-muted small mb-3">
+                        Empresas consideradas: <t t-esc="companiesLabel"/>
+                    </div>
+
+                    <t t-if="state.data.mixed_currencies">
+                        <div class="alert alert-warning">
+                            As empresas ativas usam moedas diferentes. Os totais abaixo somam
+                            valores de moedas distintas e não devem ser usados para decisão.
+                        </div>
+                    </t>
+
+                    <!-- Confiabilidade: vem antes dos números, não depois -->
+                    <t t-if="health and !health.reliable">
+                        <div class="alert alert-danger">
+                            <div class="fw-bold mb-1">Esta posição não reflete o banco</div>
+                            <ul class="mb-0 small">
+                                <li t-if="health.stale_journals.length">
+                                    Extrato atrasado em <t t-esc="health.stale_journals.length"/>
+                                    conta(s):
+                                    <t t-foreach="health.stale_journals" t-as="stale" t-key="stale.journal_id">
+                                        <span t-esc="stale.journal"/>
+                                        (<t t-if="stale.last_statement">até <t t-esc="date(stale.last_statement)"/></t>
+                                         <t t-else="">nunca importado</t>)<t t-if="!stale_last">, </t>
+                                    </t>
+                                </li>
+                                <li t-if="health.pending_statement_lines">
+                                    <t t-esc="health.pending_statement_lines"/> linha(s) de extrato
+                                    ainda não conciliada(s).
+                                </li>
+                                <li t-if="!health.recent_settlements">
+                                    Nenhum recebimento ou pagamento registrado nos últimos
+                                    <t t-esc="health.window_days"/> dias — os títulos abaixo podem
+                                    já ter sido liquidados no banco sem baixa no sistema.
+                                </li>
+                            </ul>
+                        </div>
+                    </t>
+
+                    <!-- Cartões principais -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="card h-100 o_fc_card" t-on-click="() => this.openCashFlow()">
+                                <div class="card-body">
+                                    <div class="text-muted small">Caixa hoje</div>
+                                    <div class="fs-3 fw-bold"
+                                         t-att-class="state.data.cash &lt; 0 ? 'text-danger' : 'text-success'"
+                                         t-esc="money(state.data.cash)"/>
+                                    <div class="small text-muted">saldo pelos extratos bancários</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="card h-100 o_fc_card" t-on-click="() => this.openReceivable()">
+                                <div class="card-body">
+                                    <div class="text-muted small">A receber</div>
+                                    <div class="fs-3 fw-bold" t-esc="money(state.data.receivable_total)"/>
+                                    <div class="small"
+                                         t-att-class="state.data.receivable_overdue ? 'text-danger' : 'text-muted'">
+                                        vencido: <t t-esc="money(state.data.receivable_overdue)"/>
+                                    </div>
+                                    <!-- Quem paga não é sempre o cliente: plataforma
+                                         repassa, e o antecipado já virou caixa. -->
+                                    <t t-if="channels.length">
+                                        <hr class="my-2"/>
+                                        <div class="small text-muted">
+                                            de clientes: <t t-esc="money(state.data.receivable_direct)"/>
+                                        </div>
+                                        <div class="small text-muted"
+                                             t-foreach="channels" t-as="channel" t-key="channel.code">
+                                            <t t-esc="channel.label"/>:
+                                            <t t-esc="money(channel.amount)"/>
+                                            <span t-if="!channel.in_flow" class="fst-italic">
+                                                (fora da projeção)
+                                            </span>
+                                        </div>
+                                    </t>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="card h-100 o_fc_card" t-on-click="() => this.openPayable()">
+                                <div class="card-body">
+                                    <div class="text-muted small">A pagar</div>
+                                    <div class="fs-3 fw-bold" t-esc="money(state.data.payable_total)"/>
+                                    <div class="small"
+                                         t-att-class="state.data.payable_overdue ? 'text-danger' : 'text-muted'">
+                                        vencido: <t t-esc="money(state.data.payable_overdue)"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 col-md-6 col-xl-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <div class="text-muted small">Posição líquida</div>
+                                    <div class="fs-3 fw-bold"
+                                         t-att-class="state.data.net_position &lt; 0 ? 'text-danger' : ''"
+                                         t-esc="money(state.data.net_position)"/>
+                                    <div class="small text-muted">caixa + a receber − a pagar</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Divergência de conciliação: aparece só quando existe -->
+                    <t t-if="gaps.length">
+                        <div class="alert alert-warning">
+                            <div class="fw-bold mb-2">
+                                Conciliação bancária divergente em <t t-esc="gaps.length"/> diário(s)
+                            </div>
+                            <div class="small mb-2">
+                                O saldo do extrato não bate com o saldo contábil. Enquanto isso não
+                                for conciliado, o caixa acima e a contabilidade contam histórias diferentes.
+                            </div>
+                            <table class="table table-sm mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Diário</th><th>Empresa</th>
+                                        <th class="text-end">Extrato</th>
+                                        <th class="text-end">Contábil</th>
+                                        <th class="text-end">Diferença</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="gaps" t-as="gap" t-key="gap.journal_id">
+                                        <td t-esc="gap.journal"/>
+                                        <td t-esc="gap.company"/>
+                                        <td class="text-end" t-esc="money(gap.statement_balance)"/>
+                                        <td class="text-end" t-esc="money(gap.account_balance)"/>
+                                        <td class="text-end text-danger fw-bold" t-esc="money(gap.gap)"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </t>
+
+                    <!-- Lançamentos manuais fora dos totais acima -->
+                    <t t-if="strayEntries.length">
+                        <div class="alert alert-info">
+                            <div class="fw-bold mb-1">Lançamentos manuais em aberto</div>
+                            <div class="small">
+                                Existem lançamentos manuais parados em contas de cliente/fornecedor.
+                                Eles <span class="fw-bold">não</span> entram nos totais acima, porque não
+                                são conta a pagar nem a receber — mas distorcem os relatórios contábeis
+                                enquanto não forem conciliados.
+                            </div>
+                            <ul class="mb-0 small">
+                                <li t-foreach="strayEntries" t-as="stray" t-key="stray.scope">
+                                    <t t-esc="stray.count"/> lançamento(s) em conta de
+                                    <t t-esc="stray.scope"/>, somando <t t-esc="money(stray.amount)"/>
+                                </li>
+                            </ul>
+                        </div>
+                    </t>
+
+                    <!-- Saldo por diário -->
+                    <div class="card">
+                        <div class="card-header fw-bold">Saldo por conta bancária</div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Diário</th><th>Empresa</th>
+                                        <th class="text-end">Saldo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr t-foreach="state.data.cash_positions" t-as="pos" t-key="pos.journal_id">
+                                        <td t-esc="pos.journal"/>
+                                        <td t-esc="pos.company"/>
+                                        <td class="text-end"
+                                            t-att-class="pos.statement_balance &lt; 0 ? 'text-danger' : ''"
+                                            t-esc="money(pos.statement_balance)"/>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+            </div>
+        </div>
+    </t>
+
+</templates>
