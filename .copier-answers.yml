@@ -1,9 +1,8 @@
 # Do NOT update manually; changes here will be overwritten by Copier
-_commit: 1e010e1
+_commit: fd8dbb0
 _src_path: https://github.com/itbrasil-odoo/itbrasil-addons-repo-template.git
 additional_ruff_rules: []
 banner_url: https://itbrasil.com.br/web/image/24368-93015bbb/readme-banner-image.png
-ci: GitHub
 enable_checklog_odoo: false
 generate_requirements_txt: true
 github_check_license: true
@@ -17,6 +16,7 @@ odoo_test_flavor: Both
 odoo_version: 19.0
 org_name: IT Brasil
 org_slug: itbrasil-odoo
+postgres_image: ''
 rebel_module_groups: []
 repo_description: Addons to improve Odoo usability
 repo_name: Odoo Usability

@@ -1,4 +1,6 @@
 
+
+# Odoo Usability
 <!-- /!\ Non OCA Context : Set here the badge of your runbot / runboat instance. -->
 [![Pre-commit Status](https://github.com/itbrasil-odoo/odoo-usability/actions/workflows/pre-commit.yml/badge.svg?branch=19.0)](https://github.com/itbrasil-odoo/odoo-usability/actions/workflows/pre-commit.yml?query=branch%3A19.0)
 [![Build Status](https://github.com/itbrasil-odoo/odoo-usability/actions/workflows/test.yml/badge.svg?branch=19.0)](https://github.com/itbrasil-odoo/odoo-usability/actions/workflows/test.yml?query=branch%3A19.0)
@@ -6,8 +8,6 @@
 <!-- /!\ Non OCA Context : Set here the badge of your translation instance. -->
 
 <!-- /!\ do not modify above this line -->
-
-# Odoo Usability
 
 Addons to improve Odoo usability
 
