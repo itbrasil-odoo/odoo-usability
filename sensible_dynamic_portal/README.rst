@@ -1,4 +1,4 @@
-.. image:: https://itbrasil.com.br/web/image/24368-93015bbb/readme-banner-image.png
+.. image:: https://github.com/itbrasil-odoo/.github/raw/main/readme-banner-image.png
    :target: https://itbrasil.com.br
    :alt: IT Brasil
 
