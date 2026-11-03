@@ -1,11 +1,11 @@
-import { Component, onWillStart, useState } from "@odoo/owl";
-import { deserializeDate, formatDate } from "@web/core/l10n/dates";
-import { _t } from "@web/core/l10n/translation";
-import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
-import { ControlPanel } from "@web/search/control_panel/control_panel";
-import { formatMonetary } from "@web/views/fields/formatters";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import {Component, onWillStart, useState} from "@odoo/owl";
+import {deserializeDate, formatDate} from "@web/core/l10n/dates";
+import {_t} from "@web/core/l10n/translation";
+import {registry} from "@web/core/registry";
+import {useService} from "@web/core/utils/hooks";
+import {ControlPanel} from "@web/search/control_panel/control_panel";
+import {formatMonetary} from "@web/views/fields/formatters";
+import {standardActionServiceProps} from "@web/webclient/actions/action_service";
 
 /**
  * Painel do Sócio: os números do financeiro consolidados das empresas ativas.
@@ -14,13 +14,13 @@ import { standardActionServiceProps } from "@web/webclient/actions/action_servic
  */
 export class FinanceOverview extends Component {
     static template = "itbr_finance_cockpit.Overview";
-    static props = { ...standardActionServiceProps };
-    static components = { ControlPanel };
+    static props = {...standardActionServiceProps};
+    static components = {ControlPanel};
 
     setup() {
         this.orm = useService("orm");
         this.action = useService("action");
-        this.state = useState({ loading: true, data: null });
+        this.state = useState({loading: true, data: null});
 
         onWillStart(async () => {
             await this.load();
@@ -29,12 +29,16 @@ export class FinanceOverview extends Component {
 
     async load() {
         this.state.loading = true;
-        this.state.data = await this.orm.call("itbr.finance.cockpit", "get_overview", []);
+        this.state.data = await this.orm.call(
+            "itbr.finance.cockpit",
+            "get_overview",
+            []
+        );
         this.state.loading = false;
     }
 
     money(value) {
-        return formatMonetary(value || 0, { currencyId: this.state.data?.currency_id });
+        return formatMonetary(value || 0, {currencyId: this.state.data?.currency_id});
     }
 
     /** O backend serializa datas em ISO; a tela mostra no formato do usuário. */

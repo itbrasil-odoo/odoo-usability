@@ -1,6 +1,6 @@
 {
     "name": "PDF Designer Lite (QWeb Builder)",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "summary": "Pick options → Generate QWeb XML → Preview → Export",
     "category": "Tools",
     "license": "LGPL-3",

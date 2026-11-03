@@ -92,14 +92,13 @@ class TestDbBackup(common.TransactionCase):
                 }
             )
 
-    @patch(f"{model}._")
-    def test_action_sftp_test_connection_success(self, _):
+    def test_action_sftp_test_connection_success(self):
         """It should raise connection succeeded warning"""
         with patch(f"{class_name}.sftp_connection", new_callable=PropertyMock):
             rec_id = self.new_record()
-            with self.assertRaises(UserError):
+            with self.assertRaises(UserError) as error:
                 rec_id.action_sftp_test_connection()
-        _.assert_called_once_with("Connection Test Succeeded!")
+        self.assertEqual(error.exception.args[0], "Connection Test Succeeded!")
 
     @patch(f"{model}._")
     def _test_action_sftp_test_connection_fail(self, _):
@@ -172,7 +171,7 @@ class TestDbBackup(common.TransactionCase):
         rec_id = self.new_record()
         with patch(f"{class_name}.search", new_callable=PropertyMock):
             rec_id.action_backup_all()
-            rec_id.search.assert_called_once_with([])
+            rec_id.search.assert_called_once_with([], limit=5)
 
     def test_action_backup_all_return(self):
         """It should return result of backup operation"""

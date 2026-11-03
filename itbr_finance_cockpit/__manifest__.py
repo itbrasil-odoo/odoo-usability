@@ -4,9 +4,9 @@
 {
     "name": "Cockpit Financeiro",
     "summary": "Telas simples de financeiro para sócios e administrativo",
-    "version": "19.0.1.0.0",
+    "version": "19.0.1.0.1",
     "author": "IT Brasil",
-    "website": "https://github.com/itbrasil-odoo",
+    "website": "https://github.com/itbrasil-odoo/odoo-usability",
     "license": "LGPL-3",
     "category": "Accounting/Accounting",
     "depends": [

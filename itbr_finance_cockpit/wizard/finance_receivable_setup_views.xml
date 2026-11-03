@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <odoo>
-
     <!--
       O texto desta tela é a entrega, tanto quanto o código: quem roda isto em
       produção precisa entender o que muda antes de apertar o botão.
@@ -10,7 +9,7 @@
         <field name="model">itbr.finance.receivable.setup</field>
         <field name="arch" type="xml">
             <form string="Conta a receber padrão">
-                <field name="state" invisible="1"/>
+                <field name="state" invisible="1" />
 
                 <div invisible="state != 'draft'">
                     <div class="alert alert-info" role="alert">
@@ -22,20 +21,27 @@
 
                     <group>
                         <group>
-                            <field name="company_id" options="{'no_create': True}"/>
-                            <field name="current_account_id" readonly="1"
-                                   options="{'no_open': True}"/>
+                            <field name="company_id" options="{'no_create': True}" />
+                            <field
+                                name="current_account_id"
+                                readonly="1"
+                                options="{'no_open': True}"
+                            />
                         </group>
                         <group>
-                            <field name="account_id" required="1" options="{'no_create': True}"/>
+                            <field
+                                name="account_id"
+                                required="1"
+                                options="{'no_create': True}"
+                            />
                         </group>
                     </group>
 
                     <group string="O que já foi postado">
-                        <field name="reclassify"/>
-                        <field name="batch_size" invisible="not reclassify"/>
-                        <field name="line_count" invisible="1"/>
-                        <field name="move_count" invisible="1"/>
+                        <field name="reclassify" />
+                        <field name="batch_size" invisible="not reclassify" />
+                        <field name="line_count" invisible="1" />
+                        <field name="move_count" invisible="1" />
                     </group>
 
                     <div invisible="not reclassify">
@@ -44,26 +50,44 @@
                             parceiro e nota fiscal permanecem. Parcelas já conciliadas ficam de
                             fora: mexer nelas desfaria a baixa.
                         </div>
-                        <field name="preview_html" readonly="1" nolabel="1"/>
+                        <field name="preview_html" readonly="1" nolabel="1" />
                     </div>
                 </div>
 
                 <div invisible="state != 'done'">
-                    <field name="remaining_moves" invisible="1"/>
-                    <field name="can_continue" invisible="1"/>
-                    <field name="result_html" readonly="1" nolabel="1"/>
+                    <field name="remaining_moves" invisible="1" />
+                    <field name="can_continue" invisible="1" />
+                    <field name="result_html" readonly="1" nolabel="1" />
                 </div>
 
                 <footer>
-                    <button name="action_apply" type="object" string="Aplicar"
-                            class="btn-primary" invisible="state != 'draft'"
-                            confirm="Confirma a alteração da conta a receber padrão desta empresa?"/>
-                    <button string="Cancelar" class="btn-secondary" special="cancel"
-                            invisible="state != 'draft'"/>
-                    <button name="action_continue" type="object" string="Continuar"
-                            class="btn-primary" invisible="state != 'done' or not can_continue"/>
-                    <button string="Fechar" class="btn-secondary" special="cancel"
-                            invisible="state != 'done'"/>
+                    <button
+                        name="action_apply"
+                        type="object"
+                        string="Aplicar"
+                        class="btn-primary"
+                        invisible="state != 'draft'"
+                        confirm="Confirma a alteração da conta a receber padrão desta empresa?"
+                    />
+                    <button
+                        string="Cancelar"
+                        class="btn-secondary"
+                        special="cancel"
+                        invisible="state != 'draft'"
+                    />
+                    <button
+                        name="action_continue"
+                        type="object"
+                        string="Continuar"
+                        class="btn-primary"
+                        invisible="state != 'done' or not can_continue"
+                    />
+                    <button
+                        string="Fechar"
+                        class="btn-secondary"
+                        special="cancel"
+                        invisible="state != 'done'"
+                    />
                 </footer>
             </form>
         </field>
@@ -75,5 +99,4 @@
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
-
 </odoo>

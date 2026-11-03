@@ -64,7 +64,8 @@ class FinanceCockpit(models.AbstractModel):
         empresa, que é o que de fato falta entrar ou sair.
         """
         lines = self.env["account.move.line"].search_read(
-            self._open_items_domain(account_type) + [("move_id.move_type", "in", move_types)],
+            self._open_items_domain(account_type)
+            + [("move_id.move_type", "in", move_types)],
             ["date_maturity", "amount_residual", "company_id"],
         )
         today = fields.Date.context_today(self)
@@ -112,7 +113,9 @@ class FinanceCockpit(models.AbstractModel):
                 direct.append(item)
             else:
                 expected = channel.get("expected_dates", {}).get(item["id"])
-                buckets[channel["code"]].append({**item, "due": expected or item["due"]})
+                buckets[channel["code"]].append(
+                    {**item, "due": expected or item["due"]}
+                )
         return direct, channels, buckets
 
     @api.model
@@ -128,7 +131,8 @@ class FinanceCockpit(models.AbstractModel):
             ("liability_payable", "fornecedor"),
         ):
             groups = self.env["account.move.line"]._read_group(
-                self._open_items_domain(account_type) + [("move_id.move_type", "=", "entry")],
+                self._open_items_domain(account_type)
+                + [("move_id.move_type", "=", "entry")],
                 aggregates=["amount_residual:sum", "__count"],
             )
             total, count = groups[0] if groups else (0.0, 0)
@@ -145,7 +149,10 @@ class FinanceCockpit(models.AbstractModel):
         conciliação — esconder isso daria uma falsa sensação de segurança.
         """
         journals = self.env["account.journal"].search(
-            [("type", "in", ("bank", "cash")), ("company_id", "in", self.env.companies.ids)]
+            [
+                ("type", "in", ("bank", "cash")),
+                ("company_id", "in", self.env.companies.ids),
+            ]
         )
         if not journals:
             return []

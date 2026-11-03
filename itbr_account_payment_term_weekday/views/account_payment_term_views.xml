@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!-- Copyright 2026 IT Brasil
+     License LGPL-3.0 or later (https://www.gnu.org/licenses/lgpl). -->
+<odoo>
+    <record id="view_payment_term_form_itbr_weekday" model="ir.ui.view">
+        <field name="name">account.payment.term.form.itbr.weekday</field>
+        <field name="model">account.payment.term</field>
+        <field name="inherit_id" ref="account.view_payment_term_form" />
+        <field name="arch" type="xml">
+            <xpath
+                expr="//field[@name='line_ids']/list/field[@name='nb_days']"
+                position="attributes"
+            >
+                <attribute
+                    name="invisible"
+                >delay_type == 'itbr_weekday_of_month'</attribute>
+            </xpath>
+            <xpath
+                expr="//field[@name='line_ids']/list/field[@name='days_next_month']"
+                position="after"
+            >
+                <field
+                    name="itbr_weekday_rank"
+                    string="Ordem"
+                    width="50px"
+                    invisible="delay_type != 'itbr_weekday_of_month'"
+                />
+                <field
+                    name="itbr_weekday"
+                    invisible="delay_type != 'itbr_weekday_of_month'"
+                />
+                <field
+                    name="itbr_month_offset"
+                    width="60px"
+                    invisible="delay_type != 'itbr_weekday_of_month'"
+                />
+                <field name="itbr_business_day" />
+            </xpath>
+        </field>
+    </record>
+</odoo>

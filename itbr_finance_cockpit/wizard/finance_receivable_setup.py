@@ -16,7 +16,7 @@ instalado — e é ele que este assistente lê e regrava.
 
 from markupsafe import Markup
 
-from odoo import _, api, fields, models
+from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools import formatLang
 
@@ -53,7 +53,8 @@ class FinanceReceivableSetup(models.TransientModel):
         # linha antes de calcular, e a NOT NULL estouraria antes da sugestão
         # existir. A obrigatoriedade fica na view e em action_apply.
         check_company=True,
-        domain="[('account_type', '=', 'asset_receivable'), ('company_ids', '=', company_id)]",
+        domain="[('account_type', '=', 'asset_receivable'), "
+        "('company_ids', '=', company_id)]",
     )
     reclassify = fields.Boolean(
         string="Reclassificar o que já está em aberto",
@@ -106,7 +107,9 @@ class FinanceReceivableSetup(models.TransientModel):
         for wizard in self:
             candidates = self.env["account.account"].search(
                 [
-                    *self.env["account.account"]._check_company_domain(wizard.company_id),
+                    *self.env["account.account"]._check_company_domain(
+                        wizard.company_id
+                    ),
                     ("account_type", "=", "asset_receivable"),
                     ("name", "=ilike", "clientes"),
                 ]
@@ -194,13 +197,18 @@ class FinanceReceivableSetup(models.TransientModel):
         self.ensure_one()
         if not self.account_id:
             raise UserError(
-                _(
+                self.env._(
                     "Escolha a conta a receber. Não foi possível sugerir uma: o plano "
                     "desta empresa não tem exatamente uma conta chamada 'Clientes'."
                 )
             )
-        if self.account_id.company_ids and self.company_id not in self.account_id.company_ids:
-            raise UserError(_("A conta escolhida não pertence à empresa selecionada."))
+        if (
+            self.account_id.company_ids
+            and self.company_id not in self.account_id.company_ids
+        ):
+            raise UserError(
+                self.env._("A conta escolhida não pertence à empresa selecionada.")
+            )
 
         self.env["ir.default"].sudo().set(
             "res.partner",
@@ -241,12 +249,19 @@ class FinanceReceivableSetup(models.TransientModel):
     def _build_result_html(self, moved, blocked):
         self.ensure_one()
         parts = [
-            Markup("<p>Conta a receber padrão de <b>%(company)s</b>: <b>%(account)s</b>.</p>")
-            % {"company": self.company_id.name, "account": self.account_id.display_name},
+            Markup(
+                "<p>Conta a receber padrão de <b>%(company)s</b>: "
+                "<b>%(account)s</b>.</p>"
+            )
+            % {
+                "company": self.company_id.name,
+                "account": self.account_id.display_name,
+            },
         ]
         if self.reclassify:
             parts.append(
-                Markup("<p>%(moved)s parcela(s) reclassificada(s).</p>") % {"moved": moved}
+                Markup("<p>%(moved)s parcela(s) reclassificada(s).</p>")
+                % {"moved": moved}
             )
         if self.remaining_moves:
             parts.append(
@@ -259,7 +274,8 @@ class FinanceReceivableSetup(models.TransientModel):
                     "hint": (
                         "Use 'Continuar' para tratar o próximo lote."
                         if self.can_continue
-                        else "Nenhum documento deste lote pôde ser alterado — veja abaixo."
+                        else "Nenhum documento deste lote pôde ser alterado — "
+                        "veja abaixo."
                     ),
                 }
             )
