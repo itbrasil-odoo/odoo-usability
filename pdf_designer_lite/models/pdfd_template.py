@@ -14,7 +14,6 @@ class PdfdTemplate(models.Model):
     key = fields.Char(string="QWeb t-name", help='Used as <t t-name="...">', copy=False)
     model_id = fields.Many2one(
         "ir.model",
-        string="Model",
         help="Bind this template to a model so portals can auto-pick it.",
         tracking=True,
     )
