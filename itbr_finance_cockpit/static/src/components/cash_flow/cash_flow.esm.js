@@ -1,10 +1,10 @@
-import { Component, onWillStart, useState } from "@odoo/owl";
-import { deserializeDate, formatDate } from "@web/core/l10n/dates";
-import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
-import { ControlPanel } from "@web/search/control_panel/control_panel";
-import { formatMonetary } from "@web/views/fields/formatters";
-import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import {Component, onWillStart, useState} from "@odoo/owl";
+import {deserializeDate, formatDate} from "@web/core/l10n/dates";
+import {registry} from "@web/core/registry";
+import {useService} from "@web/core/utils/hooks";
+import {ControlPanel} from "@web/search/control_panel/control_panel";
+import {formatMonetary} from "@web/views/fields/formatters";
+import {standardActionServiceProps} from "@web/webclient/actions/action_service";
 
 /**
  * Fluxo de caixa projetado.
@@ -15,12 +15,12 @@ import { standardActionServiceProps } from "@web/webclient/actions/action_servic
  */
 export class FinanceCashFlow extends Component {
     static template = "itbr_finance_cockpit.CashFlow";
-    static props = { ...standardActionServiceProps };
-    static components = { ControlPanel };
+    static props = {...standardActionServiceProps};
+    static components = {ControlPanel};
 
     setup() {
         this.orm = useService("orm");
-        this.state = useState({ loading: true, weeks: 13, data: null });
+        this.state = useState({loading: true, weeks: 13, data: null});
 
         onWillStart(async () => {
             await this.load();
@@ -29,9 +29,14 @@ export class FinanceCashFlow extends Component {
 
     async load() {
         this.state.loading = true;
-        this.state.data = await this.orm.call("itbr.finance.cockpit", "get_cash_flow", [], {
-            weeks: this.state.weeks,
-        });
+        this.state.data = await this.orm.call(
+            "itbr.finance.cockpit",
+            "get_cash_flow",
+            [],
+            {
+                weeks: this.state.weeks,
+            }
+        );
         this.state.loading = false;
     }
 
@@ -41,7 +46,7 @@ export class FinanceCashFlow extends Component {
     }
 
     money(value) {
-        return formatMonetary(value || 0, { currencyId: this.state.data?.currency_id });
+        return formatMonetary(value || 0, {currencyId: this.state.data?.currency_id});
     }
 
     /** O backend serializa datas em ISO; a tela mostra no formato do usuário. */

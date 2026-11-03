@@ -3,8 +3,9 @@
 """A conta a receber padrão e a reclassificação do que já foi postado."""
 
 from odoo import fields
-from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 from odoo.tests import tagged
+
+from odoo.addons.account.tests.common import AccountTestInvoicingCommon
 
 
 @tagged("post_install", "-at_install")
@@ -57,13 +58,19 @@ class TestReceivableSetup(AccountTestInvoicingCommon):
                 "invoice_date": fields.Date.context_today(self.env["account.move"]),
                 "journal_id": self.company_data["default_journal_sale"].id,
                 "invoice_line_ids": [
-                    (0, 0, {
-                        "name": "produto de teste",
-                        "quantity": 1,
-                        "price_unit": 100.0,
-                        "tax_ids": [],
-                        "account_id": self.company_data["default_account_revenue"].id,
-                    })
+                    (
+                        0,
+                        0,
+                        {
+                            "name": "produto de teste",
+                            "quantity": 1,
+                            "price_unit": 100.0,
+                            "tax_ids": [],
+                            "account_id": self.company_data[
+                                "default_account_revenue"
+                            ].id,
+                        },
+                    )
                 ],
             }
         )
@@ -102,7 +109,9 @@ class TestReceivableSetup(AccountTestInvoicingCommon):
 
     def test_apply_moves_the_open_line(self):
         invoice = self._invoice()
-        term = invoice.line_ids.filtered(lambda line: line.display_type == "payment_term")
+        term = invoice.line_ids.filtered(
+            lambda line: line.display_type == "payment_term"
+        )
         self.assertEqual(term.account_id, self.transit)
 
         wizard = self._wizard()
@@ -117,29 +126,44 @@ class TestReceivableSetup(AccountTestInvoicingCommon):
 
     def test_apply_leaves_reconciled_lines_alone(self):
         invoice = self._invoice()
-        term = invoice.line_ids.filtered(lambda line: line.display_type == "payment_term")
+        term = invoice.line_ids.filtered(
+            lambda line: line.display_type == "payment_term"
+        )
 
         counterpart = self.env["account.move"].create(
             {
                 "move_type": "entry",
                 "journal_id": self.company_data["default_journal_misc"].id,
                 "line_ids": [
-                    (0, 0, {
-                        "account_id": self.transit.id,
-                        "partner_id": self.partner.id,
-                        "credit": invoice.amount_total,
-                    }),
-                    (0, 0, {
-                        "account_id": self.company_data["default_account_revenue"].id,
-                        "debit": invoice.amount_total,
-                    }),
+                    (
+                        0,
+                        0,
+                        {
+                            "account_id": self.transit.id,
+                            "partner_id": self.partner.id,
+                            "credit": invoice.amount_total,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "account_id": self.company_data[
+                                "default_account_revenue"
+                            ].id,
+                            "debit": invoice.amount_total,
+                        },
+                    ),
                 ],
             }
         )
         counterpart.action_post()
-        (term + counterpart.line_ids.filtered(
-            lambda line: line.account_id == self.transit
-        )).reconcile()
+        (
+            term
+            + counterpart.line_ids.filtered(
+                lambda line: line.account_id == self.transit
+            )
+        ).reconcile()
 
         wizard = self._wizard()
         self.assertEqual(wizard.line_count, 0)
@@ -158,7 +182,9 @@ class TestReceivableSetup(AccountTestInvoicingCommon):
         wizard.batch_size = 1
         wizard.action_apply()
 
-        self.assertEqual(len(terms.filtered(lambda t: t.account_id == self.clientes)), 1)
+        self.assertEqual(
+            len(terms.filtered(lambda t: t.account_id == self.clientes)), 1
+        )
         self.assertEqual(wizard.remaining_moves, 2)
         self.assertTrue(wizard.can_continue)
 
@@ -175,15 +201,25 @@ class TestReceivableSetup(AccountTestInvoicingCommon):
                 "move_type": "entry",
                 "journal_id": self.company_data["default_journal_misc"].id,
                 "line_ids": [
-                    (0, 0, {
-                        "account_id": self.transit.id,
-                        "partner_id": self.partner.id,
-                        "debit": 50.0,
-                    }),
-                    (0, 0, {
-                        "account_id": self.company_data["default_account_revenue"].id,
-                        "credit": 50.0,
-                    }),
+                    (
+                        0,
+                        0,
+                        {
+                            "account_id": self.transit.id,
+                            "partner_id": self.partner.id,
+                            "debit": 50.0,
+                        },
+                    ),
+                    (
+                        0,
+                        0,
+                        {
+                            "account_id": self.company_data[
+                                "default_account_revenue"
+                            ].id,
+                            "credit": 50.0,
+                        },
+                    ),
                 ],
             }
         )
